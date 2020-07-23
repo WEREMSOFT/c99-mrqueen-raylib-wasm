@@ -228,6 +228,7 @@ void bb_init() {
     }
     if(error_on_table){
         printf("ERROR: invalid ATTACK_BISHOP table\n");
+        exit(-1);
         error_on_table = false;
     } 
 
@@ -257,6 +258,7 @@ void bb_init() {
 
     if(error_on_table){
         printf("ERROR: invalid ATTACK_ROOK table\n");
+        exit(-1);
     } 
 
     // HASH

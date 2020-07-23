@@ -122,16 +122,6 @@ int parse_line(char *command) {
     return 1;
 }
 
-#define COMMAND_COUNT 5
-
-void uci_main() {
+void uci_board_reset(){
     board_reset(&board);
-
-    char commands[COMMAND_COUNT][1000] = { "uci", "ucinewgame", "isready", "position startpos moves d2d4", "go wtime 300000 btime", "quit"};
-
-    for(int i = 0; i < COMMAND_COUNT; i++){
-        parse_line(commands[i]);
-    }
-
-    // while (parse_line());
 }
