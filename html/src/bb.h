@@ -1,7 +1,7 @@
 #ifndef BB_H
 #define BB_H
 
-#define BIT(sq) (1L << (sq))
+#define BIT(sq) (1LL << (sq))
 #define RF(rank, file) ((rank) * 8 + (file))
 
 #define LSB(x) (__builtin_ctzll(x))

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "bb.h"
 #include "util.h"
+#include <stdbool.h>
 
 bb BB_KNIGHT[64];
 bb BB_KING[64];
@@ -202,6 +203,8 @@ void bb_init() {
 
     // ATTACK_BISHOP
     offset = 0;
+    bool error_on_table = false;
+
     for (int sq = 0; sq < 64; sq++) {
         int count = bb_squares(BB_BISHOP_6[sq], squares);
         int n = 1 << count;
@@ -216,13 +219,17 @@ void bb_init() {
             int index = (obstacles * MAGIC_BISHOP[sq]) >> SHIFT_BISHOP[sq];
             bb previous = ATTACK_BISHOP[offset + index];
             if (previous && previous != value) {
-                printf("ERROR: invalid ATTACK_BISHOP table\n");
+                error_on_table = true;
             }
             ATTACK_BISHOP[offset + index] = value;
         }
         OFFSET_BISHOP[sq] = offset;
         offset += 1 << (64 - SHIFT_BISHOP[sq]);
     }
+    if(error_on_table){
+        printf("ERROR: invalid ATTACK_BISHOP table\n");
+        error_on_table = false;
+    } 
 
     // ATTACK_ROOK
     offset = 0;
@@ -240,13 +247,17 @@ void bb_init() {
             int index = (obstacles * MAGIC_ROOK[sq]) >> SHIFT_ROOK[sq];
             bb previous = ATTACK_ROOK[offset + index];
             if (previous && previous != value) {
-                printf("ERROR: invalid ATTACK_ROOK table\n");
+                error_on_table = true;
             }
             ATTACK_ROOK[offset + index] = value;
         }
         OFFSET_ROOK[sq] = offset;
         offset += 1 << (64 - SHIFT_ROOK[sq]);
     }
+
+    if(error_on_table){
+        printf("ERROR: invalid ATTACK_ROOK table\n");
+    } 
 
     // HASH
     HASH_COLOR = bb_random();
