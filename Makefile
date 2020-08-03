@@ -37,7 +37,7 @@ BIN_EXTENSION = bin
 
 # Vars for emscripten build
 RAYLIB_PATH := /Users/pabloweremczuk/Documents/Proyectos/c/raylib
-EMSC_CFLAGS := -O2 -s -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0 -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -v -D OS_WEB
+EMSC_CFLAGS := -O2 -s -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0 -s USE_GLFW=3 -s TOTAL_MEMORY=67108864 -v -D OS_WEB -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4
 EMSC_CC := emcc
 EMSC_STATIC_LIBS_D := $(LIBS_D)static/libraylib.bc
 # EMSC_STATIC_LIBS_D := $(LIBS_D)static/libraylib.bc
@@ -67,7 +67,7 @@ endif
 
 all: print_information $(BLD_D)main.$(BIN_EXTENSION) web
 
-main: $(OBJ_FILES)
+main: $(SRC_FILES)
 	$(CC_COMMAND) -o $(BLD_D)$@.bin $^ $(LINK_LIBS)
 
 web: $(HTML_D)main.html

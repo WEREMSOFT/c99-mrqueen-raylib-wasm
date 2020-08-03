@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include "console_output.h"
+
+
 void uci_main() {
     board_reset(&board);
 

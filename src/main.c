@@ -1,10 +1,12 @@
 #include <time.h>
+#include <unistd.h>
+#include <stdio.h>
+#define DEBUG_PRINT
+#include "console_output.h"
 #include "bb.h"
 #include "uci.h"
 #include "util.h"
-#include <unistd.h>
 
-#include <stdio.h>
 #include <raylib.h>
 
 #define RAYGUI_IMPLEMENTATION
@@ -20,18 +22,24 @@
 #define WIDTH 800
 #define HEIGHT 600
 
+
 char textBoxText[1000] = "";
 
 void update_frame(void) {
+    static char command[100] = {0};
     BeginDrawing();
     {
         ClearBackground(WHITE);
         DrawFPS(10, 10);
         {
-            GuiTextBoxMulti((Rectangle){ 10, 10, 780, 300 }, textBoxText, 999, true);
-            if (GuiButton((Rectangle){ 10, 315, 125, 30 }, GuiIconText(RICON_NONE, "Send Command")))
+            char *c = console_buffer_get();
+            GuiTextBoxMulti((Rectangle){ 10, 10, 780, 300 }, c, 10000, false);
+            GuiTextBox((Rectangle){ 10, 315, 780, 30 }, command, 100, true);
+            if (GuiButton((Rectangle){ 10, 355, 125, 30 }, GuiIconText(RICON_NONE, "Send Command")) 
+            || IsKeyPressed(KEY_ENTER))
             {
-                printf("Button Clicked!!\n");
+                parse_line(command);
+                command[0] = '\0';
             }
         }
     }EndDrawing();
@@ -49,6 +57,14 @@ int main(void)
     printf("MacOS dettected\n");
 #elif defined OS_WEB
     printf("Browser dettected\n");
+#endif
+
+printf("The number is: %d\n", 10);
+
+#ifdef __EMSCRIPTEN_PTHREADS__
+    printf("Pthreads enabled\n");
+#else
+    printf("NO THREADS!!!\n");
 #endif
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
@@ -77,13 +93,3 @@ int main(void)
     return 0;
 }
 
-
-// int main(int argc, char **argv) {
-//     bb_init();
-//     prng_seed(time(NULL));
-//     uci_main();
-
-//     sleep(5);
-
-//     return 0;
-// }

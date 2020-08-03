@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "console_output.h"
 #include <string.h>
 #include "board.h"
 
