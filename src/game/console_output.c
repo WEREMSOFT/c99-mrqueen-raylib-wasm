@@ -13,5 +13,15 @@ void console_buffer_print(char *buffer) {
         strcpy(console_buffer, s);
     }
 
-    strncat(console_buffer, buffer, CONSOLE_BUFFER_SIZE);\
+    strncat(console_buffer, buffer, CONSOLE_BUFFER_SIZE);
+    pending_commands_count++;
+}
+
+int console_buffer_pending_commands()
+{
+    return pending_commands_count;
+}
+void console_buffer_clear_pending_commands()
+{
+    pending_commands_count = 0;
 }

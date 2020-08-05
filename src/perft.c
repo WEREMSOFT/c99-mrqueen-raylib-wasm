@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "console_output.h"
+#include "game/console_output.h"
 #include "gen.h"
 #include "move.h"
 #include "perft.h"

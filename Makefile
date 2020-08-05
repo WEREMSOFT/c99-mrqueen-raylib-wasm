@@ -26,6 +26,7 @@ HTML_D := html/
 ASM_D := asm/
 
 SRC_FILES := $(wildcard $(SRC_D)*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/*.c)
 OBJ_FILES := $(patsubst $(SRC_D)%.c,$(OBJ_D)%.o,$(SRC_FILES))
 
 INCLUDE_D := -I$(LIBS_D)include/
