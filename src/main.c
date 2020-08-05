@@ -3,9 +3,9 @@
 #include <stdio.h>
 #define DEBUG_PRINT
 #include "game/console_output.h"
-#include "bb.h"
-#include "uci.h"
-#include "util.h"
+#include "mister_queen/bb.h"
+#include "mister_queen/uci.h"
+#include "mister_queen/util.h"
 #include "game/types.h"
 #include "game/game_state.h"
 
@@ -183,9 +183,9 @@ int main(void)
     printf("Browser dettected\n");
 #endif
 
-    Camera3D c = camera_init();
-    game_state.camera = c;
-
+    game_state.camera = camera_init();
+    game_state.selector.state = SELECTOR_STATE_READY;
+    
     game_board_reset(&game_state);
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
