@@ -1,3 +1,5 @@
+#ifndef __TYPES_H__
+#define __TYPES_H__
 enum enum_models
 {
     MODEL_BOARD,
@@ -26,5 +28,7 @@ enum enum_commands {
     UCI,
     UCINEWGAME,
     ISREADY,
+    GO,
     COMMAND_COUNT
 };
+#endif

@@ -1,11 +1,8 @@
+#ifndef __GAME_STATE_H__
+#define __GAME_STATE_H__
+
 #include <raylib.h>
 #include "selector.h"
-
-char commands[COMMAND_COUNT][50] = {
-    "uci",
-    "ucinewgame",
-    "isready"
-};
 
 const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B, KGT_B, TWR_B},
                             {PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B},
@@ -24,3 +21,4 @@ typedef struct game_state_t
     Camera3D camera;
     selector_t selector;
 } game_state_t;
+#endif

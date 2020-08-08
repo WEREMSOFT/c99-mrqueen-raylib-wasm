@@ -84,6 +84,7 @@ $(TEST_BLD_D)%.spec.$(BIN_EXTENSION): $(TEST_SRC_D)%.spec.c
 	@echo ""
 
 $(BLD_D)%.$(BIN_EXTENSION): $(SRC_FILES)
+	@make clean
 	@echo "### Building tests for $(@) START ###"
 	$(CC_COMMAND) -o $@ $^ $(LINK_LIBS)
 	@echo "### End ###"

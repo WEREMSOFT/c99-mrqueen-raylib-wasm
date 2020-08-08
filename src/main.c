@@ -8,6 +8,7 @@
 #include "mister_queen/util.h"
 #include "game/types.h"
 #include "game/game_state.h"
+#include "game/event.h"
 
 #include <raylib.h>
 
@@ -31,10 +32,10 @@ Camera3D camera_init()
     Camera3D return_value = {0};
 
     return_value.fovy = 45.0f;
-    return_value.target = (Vector3){-0.5f, 0.0f, 0.f};
+    return_value.target = (Vector3){3.5f, 0.0f, 2.f};
     return_value.type = CAMERA_PERSPECTIVE;
     return_value.up = (Vector3){0, 1.0f, 0};
-    return_value.position = (Vector3){-0.5f, 7.0f, 7.0f};
+    return_value.position = (Vector3){3.5f, 6.0f, 13.0f};
 
     return return_value;
 }
@@ -42,21 +43,21 @@ Camera3D camera_init()
 void console_draw()
 {
     static char command[100] = {0};
-    char *c = console_buffer_get();
-    int pending_commands = console_buffer_pending_commands();
-    if(pending_commands > 0)
-    {
-        printf("Pending commands %d\n", pending_commands);
-    }
+    // char *c = console_buffer_get();
+    // int pending_commands = console_buffer_pending_commands();
+    // if(pending_commands > 0)
+    // {
+    //     printf("Pending commands %d\n", pending_commands);
+    // }
     GuiDrawRectangle((Rectangle){0, 0, 800, 400}, 1, DARKGRAY, LIGHTGRAY);
-    GuiTextBoxMulti((Rectangle){10, 10, 780, 300}, c, 10000, false);
+    // GuiTextBoxMulti((Rectangle){10, 10, 780, 300}, c, 10000, false);
     GuiTextBox((Rectangle){10, 315, 780, 30}, command, 100, true);
-    if (GuiButton((Rectangle){10, 355, 125, 30}, GuiIconText(RICON_NONE, "Send Command")) || IsKeyPressed(KEY_ENTER))
+    if (GuiButton((Rectangle){10, 355, 125, 30}, GuiIconText(RICON_200, "Send Command")) || IsKeyPressed(KEY_ENTER))
     {
         parse_line(command);
         command[0] = '\0';
     }
-    console_buffer_clear_pending_commands();
+    // console_buffer_clear_pending_commands();
 }
 
 void pieces_draw(int piece, Vector3 position)
@@ -118,8 +119,8 @@ void pieces_draw(int piece, Vector3 position)
 
 void board_draw(game_state_t *game_state)
 {
-    float offsetX = -4.0f;
-    float offsetZ = -4.0f;
+    float offsetX = 0.0f;
+    float offsetZ = 0.0f;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -183,6 +184,33 @@ int main(void)
     printf("Browser dettected\n");
 #endif
 
+    event_t evt = {0};
+    for(int i = 0; i < 50; i++)
+    {
+        evt.type = EVENT_COMMAND;
+        snprintf(evt.data, 30, "cadorna %d", i);
+        event_queue(evt);
+    }
+  
+    for(unsigned int i = 0; i < 30; i++)
+    {
+        evt = event_dequeue();
+        printf("hay events: %s\n", evt.data);
+    }
+
+    for(int i = 0; i < 100; i++)
+    {
+        evt.type = EVENT_COMMAND;
+        snprintf(evt.data, 30, "cadorna2 %d", i);
+        event_queue(evt);
+    }
+
+    while((evt = event_dequeue()).type)
+        printf("hay events: %s\n", evt.data);
+    
+    printf("no hay events\n");
+
+    return 0;
     game_state.camera = camera_init();
     game_state.selector.state = SELECTOR_STATE_READY;
     
