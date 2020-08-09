@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "game/game_board.h"
 #include "game/console_output.h"
 #include "mister_queen/bb.h"
 #include "mister_queen/uci.h"
