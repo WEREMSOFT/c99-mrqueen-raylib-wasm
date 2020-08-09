@@ -200,7 +200,7 @@ int do_search(Search *search, Board *board) {
         sleep(1);
         char move_string[16];
         move_to_string(&search->move, move_string);
-        printf("bestmove %s\n", move_string);
+        simple_printf("bestmove %s\n", move_string);
         return 1;
     }
     search->stop = 0;
@@ -264,7 +264,7 @@ int do_search(Search *search, Board *board) {
     if (search->uci) {
         char move_string[16];
         move_to_string(&search->move, move_string);
-        printf("bestmove %s\n", move_string);
+        simple_printf("bestmove %s\n", move_string);
     }
     table_free(&search->table);
     pawn_table_free(&search->pawn_table);

@@ -412,7 +412,7 @@ int bk_test(int index, char *fen, char *bm) {
     char padded[16];
     sprintf(padded, " %s ", notation);
     int result = strstr(bm, padded) != NULL;
-    printf("%4d) %s: %8s [%s]\n",
+    simple_printf("%4d) %s: %8s [%s]\n",
         index + 1, result ? "PASS" : "FAIL", notation, bm);
     return result;
 }
@@ -426,7 +426,7 @@ void bk_tests() {
         int result = bk_test(i, fen, bm);
         passed += result;
         count += 1;
-        printf("%4d of %d tests passed.\r", passed, count);
+        simple_printf("%4d of %d tests passed.\r", passed, count);
     }
 }
 

@@ -465,7 +465,7 @@ void notate_move(Board *board, Move *move, char *result) {
 void print_move(Board *board, Move *move) {
     char notation[16];
     notate_move(board, move, notation);
-    printf("%s", notation);
+    simple_printf("%s", notation);
 }
 
 int parse_move(Board *board, const char *notation, Move *move) {

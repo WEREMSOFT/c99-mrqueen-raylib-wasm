@@ -16,13 +16,13 @@ static Search search;
 static thrd_t thrd;
 
 void handle_uci() {
-    printf("id name Mister Queen\n");
-    printf("id author Michael Fogleman\n");
-    printf("uciok\n");
+    simple_printf("id name Mister Queen\n");
+    simple_printf("id author Michael Fogleman\n");
+    simple_printf("uciok\n");
 }
 
 void handle_isready() {
-    printf("readyok\n");
+    simple_printf("readyok\n");
 }
 
 void handle_fen(char *fen) {
@@ -83,7 +83,7 @@ void handle_stop() {
 }
 
 int parse_line(char *command) {
-    printf("$-> %s\n", command);
+    simple_printf("$-> %s\n", command);
 
     char *line = strip(command);
     if (strcmp(line, "uci") == 0) {

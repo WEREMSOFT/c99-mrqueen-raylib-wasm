@@ -141,7 +141,7 @@ void in_game_ui_draw(game_state_t* game_state){
     {
         parse_line(&commands[UCI]);
         parse_line(&commands[UCINEWGAME]);
-        parse_line(&commands[ISREADY]);
+        parse_line((char *)&commands[ISREADY]);
         game_board_reset(game_state);
     }
 }
@@ -151,7 +151,7 @@ void update_frame(void)
     event_t event = {0};
     while((event = event_dequeue()).type)
     {
-        printf("event: %s\n", event.data);
+        simple_printf("event: %s\n", event.data);
     }
     
     BeginDrawing();
@@ -180,14 +180,16 @@ void update_frame(void)
 
 int main(void)
 {
+    console_buffer_init();
+
 #ifdef OS_Windows_NT
-    printf("Windows dettected\n");
+    simple_printf("Windows dettected\n");
 #elif defined OS_Linux
-    printf("LINUS dettected\n");
+    simple_printf("LINUS dettected\n");
 #elif defined OS_Darwin
-    printf("MacOS dettected\n");
+    simple_printf("MacOS dettected\n");
 #elif defined OS_WEB
-    printf("Browser dettected\n");
+    simple_printf("Browser dettected\n");
 #endif
 
     game_state.camera = camera_init();
@@ -212,5 +214,6 @@ int main(void)
     }
 #endif
     CloseWindow();
+    console_buffer_fini();
     return 0;
 }

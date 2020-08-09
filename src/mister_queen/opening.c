@@ -58,7 +58,7 @@ void node_result(Node *node, int result) {
 }
 
 void node_print(Node *node) {
-    printf("%d, %d, %d, %d\n",
+    simple_printf("%d, %d, %d, %d\n",
         node->white, node->draw, node->black, node->total);
     int total = 0;
     for (int i = 0; i < MAX_CHILDREN; i++) {
@@ -75,7 +75,7 @@ void node_print(Node *node) {
             int black = 100 * child->black / child->total;
             int pct = 100 * child->total / total;
             int total = child->total;
-            printf("%8s [%3d%% %3d%% %3d%%] %3d%% %d\n",
+            simple_printf("%8s [%3d%% %3d%% %3d%%] %3d%% %d\n",
                 child->move, white, draw, black, pct, total);
         }
     }
@@ -102,7 +102,7 @@ void node_visit(Node *node, Board *board, int depth) {
         if (!parse_move(board, child->move, &move)) {
             continue;
         }
-        printf("(0x%016llx, %2d, %2d, %d),\n",
+        simple_printf("(0x%016llx, %2d, %2d, %d),\n",
             board->hash, move.src, move.dst, child->total);
         do_move(board, &move, &undo);
         node_visit(child, board, depth + 1);
@@ -138,7 +138,7 @@ void handle_line(Node *root, char *line) {
 
 int opening_main(int argc, char **argv) {
     if (argc != 2) {
-        printf("Usage: main <input pgn file>\n");
+        simple_printf("Usage: main <input pgn file>\n");
         return 0;
     }
     Node *root = node_alloc("");

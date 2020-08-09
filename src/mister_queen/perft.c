@@ -56,10 +56,10 @@ void perft_test(char *fen, unsigned long long *expected, int count) {
         unsigned long long actual = perft(&board, depth);
         char *result = actual == expected[depth] ? "PASS" : "FAIL";
         double elapsed = now() - start;
-        printf("%s: depth = %2d, time = %.3f, expected = %12llu, actual = %12llu, hits = %g%%\n",
+        simple_printf("%s: depth = %2d, time = %.3f, expected = %12llu, actual = %12llu, hits = %g%%\n",
             result, depth, elapsed, expected[depth], actual, 100.0 * hits / actual);
     }
-    printf("\n");
+    simple_printf("\n");
 }
 
 void perft_tests() {

@@ -57,6 +57,6 @@ event_t event_dequeue() {
     return return_value;
 }
 
-#undef EVENT_QUEUE_SIZE;
+#undef EVENT_QUEUE_SIZE
 
 #endif

@@ -228,7 +228,7 @@ void bb_init() {
         offset += 1 << (64 - SHIFT_BISHOP[sq]);
     }
     if(error_on_table){
-        printf("ERROR: invalid ATTACK_BISHOP table\n");
+        simple_printf("ERROR: invalid ATTACK_BISHOP table\n");
         exit(-1);
         error_on_table = false;
     } 
@@ -258,7 +258,7 @@ void bb_init() {
     }
 
     if(error_on_table){
-        printf("ERROR: invalid ATTACK_ROOK table\n");
+        simple_printf("ERROR: invalid ATTACK_ROOK table\n");
         exit(-1);
     } 
 

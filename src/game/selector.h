@@ -68,7 +68,7 @@ static char board_coord_y[8] = {'8', '7', '6', '5', '4', '3', '2', '1'};
 void send_move_to_engine(selector_t *selector)
 {
     char position_as_command[300] = {0};
-    snprintf(position_as_command, 300, "position startpos moves %c%c%c%c\n", 
+    snprintf(position_as_command, 300, "position startpos moves %c%c%c%c", 
         board_coord_x[(int)selector->position_start.x], 
         board_coord_y[(int)selector->position_start.z], 
         board_coord_x[(int)selector->position.x], 
