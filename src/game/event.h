@@ -15,7 +15,7 @@ enum event_type_e {
 
 typedef struct event_t {
     unsigned int type;
-    char data[100];
+    char data[200];
 } event_t;
 
 
