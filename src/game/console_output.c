@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+static char *console_buffer = NULL;
+static int pending_commands_count = 0;
+
 void console_buffer_init()
 {
     console_buffer = calloc(sizeof(char), CONSOLE_BUFFER_SIZE);
@@ -20,21 +23,33 @@ char* console_buffer_get()
 
 void console_buffer_print(char *buffer) {
     assert(console_buffer != NULL && "Console buffer is not properly initialized");
+
+    char* command = strstr(buffer, "bestmove");
+
+    if(command != NULL) {
+        command = index(buffer, ' ');
+        command++;
+        char coordinates[5] = {0};
+        strncpy(coordinates, command, 4);
+        printf("coordinates are: -%s-\n", coordinates);
+    }
+    
     static int lines = 0;
     lines++;
     if(lines > 19) {
         char* s = index(console_buffer, '\n');
         if(s != NULL)
         {
-            s++; // we skip the \n character
-    //         unsigned int index = 0;
-    //         printf("==>: %s\n=====\n", console_buffer);
-    //         while(*s){ // || index < CONSOLE_BUFFER_SIZE){
-    //             console_buffer[index] = *s;
-    //             s++;
-    //             index++;
-    //         }
-            strncpy(console_buffer, s, strlen(s));
+            static int lines = 0;
+            lines++;
+            if(lines > 19) {
+                char* s = index(console_buffer, '\n');
+                s++;
+                strncpy(console_buffer, s, CONSOLE_BUFFER_SIZE);
+            }
+
+            strncat(console_buffer, buffer, CONSOLE_BUFFER_SIZE);
+            pending_commands_count++;
         } else {
             printf("no encontro el coso?\n");
         }

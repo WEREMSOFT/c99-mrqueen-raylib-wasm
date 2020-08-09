@@ -1,7 +1,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdio.h>
-#define DEBUG_PRINT
+
+#include "game/game_board.h"
 #include "game/console_output.h"
 #include "mister_queen/bb.h"
 #include "mister_queen/uci.h"
@@ -11,11 +12,9 @@
 #include "game/event.h"
 
 #include <raylib.h>
-
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
 #include <raygui.h>
-
 #undef RAYGUI_IMPLEMENTATION
 
 #ifdef OS_WEB
@@ -27,18 +26,6 @@
 
 game_state_t game_state = {0};
 
-Camera3D camera_init()
-{
-    Camera3D return_value = {0};
-
-    return_value.fovy = 45.0f;
-    return_value.target = (Vector3){3.5f, 0.0f, 2.f};
-    return_value.type = CAMERA_PERSPECTIVE;
-    return_value.up = (Vector3){0, 1.0f, 0};
-    return_value.position = (Vector3){3.5f, 6.0f, 13.0f};
-
-    return return_value;
-}
 
 void console_draw()
 {
@@ -60,7 +47,20 @@ void console_draw()
     console_buffer_clear_pending_commands();
 }
 
-void pieces_draw(int piece, Vector3 position)
+Camera3D camera_init()
+{
+    Camera3D return_value = {0};
+
+    return_value.fovy = 45.0f;
+    return_value.target = (Vector3){3.5f, 0.0f, 2.f};
+    return_value.type = CAMERA_PERSPECTIVE;
+    return_value.up = (Vector3){0, 1.0f, 0};
+    return_value.position = (Vector3){3.5f, 6.0f, 13.0f};
+
+    return return_value;
+}
+
+void game_board_pieces_draw(int piece, Vector3 position)
 {
     switch (piece)
     {
@@ -117,7 +117,7 @@ void pieces_draw(int piece, Vector3 position)
     }
 }
 
-void board_draw(game_state_t *game_state)
+void game_board_draw(game_state_t *game_state)
 {
     float offsetX = 0.0f;
     float offsetZ = 0.0f;
@@ -126,7 +126,7 @@ void board_draw(game_state_t *game_state)
         for (int j = 0; j < 8; j++)
         {
             Vector3 pos = (Vector3){i + offsetX, -0.5f, j + offsetZ};
-            pieces_draw(game_state->board[j][i], pos);
+            game_board_pieces_draw(game_state->board[j][i], pos);
             DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? BLACK : WHITE);
         }
     }
@@ -139,8 +139,8 @@ void game_board_reset(game_state_t* game_state){
 void in_game_ui_draw(game_state_t* game_state){
     if (GuiButton((Rectangle){10, 10, 125, 30}, GuiIconText(RICON_NONE, "New Game")))
     {
-        parse_line(&commands[UCI]);
-        parse_line(&commands[UCINEWGAME]);
+        parse_line(commands[UCI]);
+        parse_line(commands[UCINEWGAME]);
         parse_line((char *)&commands[ISREADY]);
         game_board_reset(game_state);
     }
@@ -161,7 +161,7 @@ void update_frame(void)
             static unsigned int draw_console = false;
             BeginMode3D(game_state.camera);
             {
-                board_draw(&game_state);
+                game_board_draw(&game_state);
                 selector_draw(&game_state.selector);
             }
             EndMode3D();

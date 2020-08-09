@@ -284,10 +284,10 @@ void board_load_fen(Board *board, char *fen) {
     i++;
     switch (fen[i++]) {
         case 'w':
-            board->color = WHITE;
+            board->color = MQ_WHITE;
             break;
         case 'b':
-            board->color = BLACK;
+            board->color = MQ_BLACK;
             board->hash ^= HASH_COLOR;
             board->pawn_hash ^= HASH_COLOR;
             break;

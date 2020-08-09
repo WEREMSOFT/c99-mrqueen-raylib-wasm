@@ -23,7 +23,7 @@ void do_null_move(Board *board, Undo *undo) {
     TOGGLE_HASH(board);
     undo->ep = board->ep;
     board->ep = 0L;
-    board->color ^= BLACK;
+    board->color ^= MQ_BLACK;
     board->hash ^= HASH_COLOR;
     board->pawn_hash ^= HASH_COLOR;
     TOGGLE_HASH(board);
@@ -32,7 +32,7 @@ void do_null_move(Board *board, Undo *undo) {
 void undo_null_move(Board *board, Undo *undo) {
     TOGGLE_HASH(board);
     board->ep = undo->ep;
-    board->color ^= BLACK;
+    board->color ^= MQ_BLACK;
     board->hash ^= HASH_COLOR;
     board->pawn_hash ^= HASH_COLOR;
     TOGGLE_HASH(board);
@@ -106,7 +106,7 @@ void do_move(Board *board, Move *move, Undo *undo) {
     if (move->src == 63 || move->dst == 63) {
         board->castle &= ~CASTLE_BLACK_KING;
     }
-    board->color ^= BLACK;
+    board->color ^= MQ_BLACK;
     board->hash ^= HASH_COLOR;
     board->pawn_hash ^= HASH_COLOR;
     TOGGLE_HASH(board);
@@ -148,7 +148,7 @@ void undo_move(Board *board, Move *move, Undo *undo) {
             board_set(board, 59, EMPTY);
         }
     }
-    board->color ^= BLACK;
+    board->color ^= MQ_BLACK;
     board->hash ^= HASH_COLOR;
     board->pawn_hash ^= HASH_COLOR;
     TOGGLE_HASH(board);

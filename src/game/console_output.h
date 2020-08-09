@@ -5,8 +5,6 @@
 #include <stdarg.h>
 
 #define CONSOLE_BUFFER_SIZE 1000000
-static char *console_buffer = NULL;
-static int pending_commands_count = 0;
 
 void console_buffer_init();
 void console_buffer_fini();

@@ -3,8 +3,8 @@
 
 #include "bb.h"
 
-#define WHITE 0x00
-#define BLACK 0x10
+#define MQ_WHITE 0x00
+#define MQ_BLACK 0x10
 
 #define EMPTY 0x00
 #define PAWN 0x01
