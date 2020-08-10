@@ -26,25 +26,20 @@
 #define HEIGHT 600
 
 game_state_t game_state = {0};
+char console_buffer[500] = {0};
 
 void console_draw()
 {
     static char command[100] = {0};
-    char *c = console_buffer_get();
-    int pending_commands = console_buffer_pending_commands();
-    if(pending_commands > 0)
-    {
-        printf("Pending commands %d\n", pending_commands);
-    }
+    
     GuiDrawRectangle((Rectangle){0, 0, 800, 400}, 1, DARKGRAY, LIGHTGRAY);
-    GuiTextBoxMulti((Rectangle){10, 10, 780, 300}, c, 10000, false);
+    GuiTextBoxMulti((Rectangle){10, 10, 780, 300}, console_buffer, 10000, false);
     GuiTextBox((Rectangle){10, 315, 780, 30}, command, 100, true);
     if (GuiButton((Rectangle){10, 355, 125, 30}, GuiIconText(RICON_200, "Send Command")) || IsKeyPressed(KEY_ENTER))
     {
         parse_line(command);
         command[0] = '\0';
     }
-    console_buffer_clear_pending_commands();
 }
 
 Camera3D camera_init()
@@ -143,6 +138,8 @@ void in_game_ui_draw(game_state_t* game_state){
         parse_line(commands[UCINEWGAME]);
         parse_line((char *)&commands[ISREADY]);
         game_board_reset(game_state);
+        char *history_buffer = command_history_get_buffer();
+        memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
     }
 }
 
@@ -173,6 +170,10 @@ void update_frame(void)
                 
                 command_history_add_command(" ");
                 command_history_add_command(event.data);
+                break;
+            case EVENT_LOG:
+                snprintf(console_buffer, 500, "%s", event.data);
+                printf("=> %s\n", event.data);
                 break;
             default:
                 printf("Unknow event: %s\n", event.data);
@@ -207,7 +208,6 @@ void update_frame(void)
 int main(void)
 {
     command_history_init();
-    console_buffer_init();
 
 #ifdef OS_Windows_NT
     simple_printf("Windows dettected\n");
@@ -231,7 +231,6 @@ int main(void)
     prng_seed(time(NULL));
     uci_board_reset();
 
-    // char commands[COMMAND_COUNT][1000] = { "uci", "ucinewgame", "isready", "position startpos moves d2d4", "go wtime 300000 btime", "quit"};
 #ifdef OS_WEB
     emscripten_set_main_loop(update_frame, 0, 1);
 #else
@@ -241,7 +240,6 @@ int main(void)
     }
 #endif
     CloseWindow();
-    console_buffer_fini();
     command_history_fini();
     return 0;
 }
