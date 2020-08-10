@@ -8,6 +8,7 @@
 #include "mister_queen/util.h"
 #include "game/types.h"
 #include "game/game_state.h"
+#include "game/selector.h"
 #include "game/event.h"
 
 #include <raylib.h>
@@ -24,7 +25,6 @@
 #define HEIGHT 600
 
 game_state_t game_state = {0};
-
 
 void console_draw()
 {
@@ -161,7 +161,7 @@ void update_frame(void)
             BeginMode3D(game_state.camera);
             {
                 game_board_draw(&game_state);
-                selector_draw(&game_state.selector);
+                selector_draw(&game_state);
             }
             EndMode3D();
             in_game_ui_draw(&game_state);
