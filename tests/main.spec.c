@@ -16,7 +16,7 @@ void tearDown(void)
     printf("This is run after EACH TEST\n");
 }
 
-void test_sum(void)
+void test_queue(void)
 {
     printf("starting test sum\n");
     TEST_ASSERT_EQUAL_INT(30, sum(10, 20));
@@ -41,7 +41,7 @@ void test_subst(void)
 int main(void)
 {
     UNITY_BEGIN();
-    RUN_TEST(test_sum);
+    RUN_TEST(test_queue);
     RUN_TEST(test_subst);
     return UNITY_END();
 }
