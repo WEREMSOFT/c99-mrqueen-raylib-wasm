@@ -65,12 +65,13 @@ endif
 # Build Targets
 #//////////////
 
-.PHONY: copy_assets web test run_% debug_optimized debug_unoptimized print_information create_folder_structure run_html_u run_html_o run_performance_test init_project
+.PHONY: main copy_assets web test run_% debug_optimized debug_unoptimized print_information create_folder_structure run_html_u run_html_o run_performance_test init_project
 
 all: print_information $(BLD_D)main.$(BIN_EXTENSION) web copy_assets
 
 main: $(SRC_FILES)
 	$(CC_COMMAND) -o $(BLD_D)$@.bin $^ $(LINK_LIBS)
+	@make copy_assets
 
 web: $(HTML_D)main.html
 
@@ -126,6 +127,7 @@ debug_%: $(BLD_D)%.$(BIN_EXTENSION)
 
 run_%: $(BLD_D)%.$(BIN_EXTENSION)
 	$^
+	@make copy_assets
 
 test_%: $(TEST_BLD_D)%.spec.$(BIN_EXTENSION)
 	$^

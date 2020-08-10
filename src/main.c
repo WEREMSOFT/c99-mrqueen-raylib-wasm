@@ -28,6 +28,14 @@
 game_state_t game_state = {0};
 char console_buffer[500] = {0};
 
+Model model_bishop = {0};
+Model model_rook = {0};
+Model model_pawn = {0};
+Model model_knight = {0};
+Model model_king = {0};
+Model model_queen = {0};
+
+
 void console_draw()
 {
     static char command[100] = {0};
@@ -51,7 +59,7 @@ Camera3D camera_init()
     return_value.type = CAMERA_PERSPECTIVE;
     return_value.up = (Vector3){0, 1.0f, 0};
     return_value.position = (Vector3){3.5f, 6.0f, 13.0f};
-
+    SetCameraMode(return_value, CAMERA_FREE);
     return return_value;
 }
 
@@ -60,52 +68,40 @@ void game_board_pieces_draw(int piece, Vector3 position)
     switch (piece)
     {
         case PWN_B:
-            DrawCylinder(position, 0.2f, 0.4f, 1.0f, 10, BLACK);
-            DrawCylinderWires(position, 0.2f, 0.4f, 1.0f, 10, LIGHTGRAY);
+            DrawModel(model_pawn, position, 0.015f, BLACK);
             break;
         case PWN_W:
-            DrawCylinder(position, 0.2f, 0.4f, 1.0f, 10, LIGHTGRAY);
-            DrawCylinderWires(position, 0.2f, 0.4f, 1.0f, 10, BLACK);
+            DrawModel(model_pawn, position, 0.015f, WHITE);
             break;
         case TWR_W:
-            DrawCylinder(position, 0.6f, 0.4f, 1.5f, 4, LIGHTGRAY);
-            DrawCylinderWires(position, 0.6f, 0.4f, 1.5f, 4, BLACK);
+            DrawModel(model_rook, position, 0.015f, WHITE);
             break;
         case TWR_B:
-            DrawCylinder(position, 0.6f, 0.4f, 1.5f, 4, BLACK);
-            DrawCylinderWires(position, 0.6f, 0.4f, 1.5f, 4, LIGHTGRAY);
+            DrawModel(model_rook, position, 0.015f, BLACK);
             break;
         case BSP_B:
-            DrawCylinder(position, 0.2f, 0.4f, 1.5f, 10, BLACK);
-            DrawCylinderWires(position, 0.2f, 0.4f, 1.5f, 10, LIGHTGRAY);
+            DrawModel(model_bishop, position, 0.015f, BLACK);
             break;
         case BSP_W:
-            DrawCylinder(position, 0.2f, 0.4f, 1.5f, 10, LIGHTGRAY);
-            DrawCylinderWires(position, 0.2f, 0.4f, 1.5f, 10, BLACK);
+            DrawModel(model_bishop, position, 0.015f, WHITE);
             break;
         case KGT_W:
-            DrawCylinder(position, 0.2f, 0.4f, 1.5f, 4, LIGHTGRAY);
-            DrawCylinderWires(position, 0.2f, 0.4f, 1.5f, 4, BLACK);
+            DrawModel(model_knight, position, 0.015f, WHITE);
             break;
         case KGT_B:
-            DrawCylinder(position, 0.2f, 0.4f, 1.5f, 4, BLACK);
-            DrawCylinderWires(position, 0.2f, 0.4f, 1.5f, 4, LIGHTGRAY);
+            DrawModel(model_knight, position, 0.015f, BLACK);
             break;
         case KNG_B:
-            DrawCylinder(position, .0f, 0.4f, 2.0f, 4, BLACK);
-            DrawCylinderWires(position, .0f, 0.4f, 2.0f, 4, LIGHTGRAY);
+            DrawModel(model_king, position, 0.015f, BLACK);
             break;
         case KNG_W:
-            DrawCylinder(position, .0f, 0.4f, 2.0f, 4, LIGHTGRAY);
-            DrawCylinderWires(position, .0f, 0.4f, 2.0f, 4, BLACK);
+            DrawModel(model_king, position, 0.015f, WHITE);
             break;
         case QEN_B:
-            DrawCylinder(position, .0f, 0.4f, 2.0f, 10, BLACK);
-            DrawCylinderWires(position, .0f, 0.4f, 2.0f, 10, LIGHTGRAY);
+            DrawModel(model_queen, position, 0.015f, BLACK);
             break;
         case QEN_W:
-            DrawCylinder(position, .0f, 0.4f, 2.0f, 10, LIGHTGRAY);
-            DrawCylinderWires(position, .0f, 0.4f, 2.0f, 10, BLACK);
+            DrawModel(model_queen, position, 0.015f, WHITE);
             break;
         default:
             break;
@@ -145,6 +141,7 @@ void in_game_ui_draw(game_state_t* game_state){
 
 void update_frame(void)
 {
+    UpdateCamera(&game_state.camera);
     event_t event = {0};
     while((event = event_dequeue()).type)
     {
@@ -219,13 +216,20 @@ int main(void)
     simple_printf("Browser dettected\n");
 #endif
 
-    game_state.camera = camera_init();
     game_state.selector.state = SELECTOR_STATE_READY;
     
     game_board_reset(&game_state);
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
+    game_state.camera = camera_init();
+
+    model_bishop = LoadModel("assets/bishop.obj");
+    model_rook = LoadModel("assets/rook.obj");
+    model_pawn = LoadModel("assets/pawn.obj");
+    model_king = LoadModel("assets/king.obj");
+    model_queen = LoadModel("assets/queen.obj");
+    model_knight = LoadModel("assets/knight.obj");
 
     bb_init();
     prng_seed(time(NULL));
