@@ -1,7 +1,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdio.h>
-
+#include <raymath.h>
 #include "game/console_output.h"
 #include "mister_queen/bb.h"
 #include "mister_queen/uci.h"
@@ -12,6 +12,9 @@
 #include "game/event.h"
 #include "game/command_history.h"
 
+#define RLIGHTS_IMPLEMENTATION
+#include "rlights.h"
+
 #include <raylib.h>
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
@@ -20,6 +23,12 @@
 
 #ifdef OS_WEB
 #include <emscripten/emscripten.h>
+#endif
+
+#if defined(OS_WEB)
+#define GLSL_VERSION            100
+#else   // PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
+#define GLSL_VERSION            330
 #endif
 
 #define WIDTH 800
@@ -68,7 +77,7 @@ void game_board_pieces_draw(int piece, Vector3 position)
     switch (piece)
     {
         case PWN_B:
-            DrawModel(model_pawn, position, 0.015f, BLACK);
+            DrawModel(model_pawn, position, 0.015f, DARKGRAY);
             break;
         case PWN_W:
             DrawModel(model_pawn, position, 0.015f, WHITE);
@@ -77,10 +86,10 @@ void game_board_pieces_draw(int piece, Vector3 position)
             DrawModel(model_rook, position, 0.015f, WHITE);
             break;
         case TWR_B:
-            DrawModel(model_rook, position, 0.015f, BLACK);
+            DrawModel(model_rook, position, 0.015f, DARKGRAY);
             break;
         case BSP_B:
-            DrawModel(model_bishop, position, 0.015f, BLACK);
+            DrawModel(model_bishop, position, 0.015f, DARKGRAY);
             break;
         case BSP_W:
             DrawModel(model_bishop, position, 0.015f, WHITE);
@@ -89,16 +98,16 @@ void game_board_pieces_draw(int piece, Vector3 position)
             DrawModel(model_knight, position, 0.015f, WHITE);
             break;
         case KGT_B:
-            DrawModel(model_knight, position, 0.015f, BLACK);
+            DrawModel(model_knight, position, 0.015f, DARKGRAY);
             break;
         case KNG_B:
-            DrawModel(model_king, position, 0.015f, BLACK);
+            DrawModel(model_king, position, 0.015f, DARKGRAY);
             break;
         case KNG_W:
             DrawModel(model_king, position, 0.015f, WHITE);
             break;
         case QEN_B:
-            DrawModel(model_queen, position, 0.015f, BLACK);
+            DrawModel(model_queen, position, 0.015f, DARKGRAY);
             break;
         case QEN_W:
             DrawModel(model_queen, position, 0.015f, WHITE);
@@ -118,7 +127,7 @@ void game_board_draw(game_state_t *game_state)
         {
             Vector3 pos = (Vector3){i + offsetX, -0.5f, j + offsetZ};
             game_board_pieces_draw(game_state->board[j][i], pos);
-            DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? BLACK : WHITE);
+            DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : WHITE);
         }
     }
 }
@@ -202,6 +211,8 @@ void update_frame(void)
     EndDrawing();
 }
 
+Shader shader = {0};
+
 int main(void)
 {
     command_history_init();
@@ -224,12 +235,40 @@ int main(void)
     SetTargetFPS(60);
     game_state.camera = camera_init();
 
+
+    shader = LoadShader(FormatText("./assets/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
+                               FormatText("./assets/shaders/glsl%i/lighting.fs", GLSL_VERSION));
+
+    shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "matModel");
+    shader.locs[LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+
+    int ambientLoc = GetShaderLocation(shader, "ambient");
+    SetShaderValue(shader, ambientLoc, (float[4]){ 0.2f, 0.2f, 0.2f, 1.0f }, UNIFORM_VEC4);
+
+    Light light_1 = CreateLight(LIGHT_POINT, (Vector3){ 0, 4, 4 }, Vector3Zero(), GRAY, shader);
+    Light light_2 = CreateLight(LIGHT_POINT, (Vector3){ 8, 15, 4 }, Vector3Zero(), GRAY, shader);
+    // Light light_3 = CreateLight(LIGHT_POINT, (Vector3){ 5, 5, 5 }, Vector3Zero(), PURPLE, shader);
+    UpdateLightValues(shader, light_1);
+    UpdateLightValues(shader, light_2);
+    // UpdateLightValues(shader, light_3);
+    
     model_bishop = LoadModel("assets/bishop.obj");
+    model_bishop.materials[0].shader = shader;
+
     model_rook = LoadModel("assets/rook.obj");
+    model_rook.materials[0].shader = shader;
+
     model_pawn = LoadModel("assets/pawn.obj");
+    model_pawn.materials[0].shader = shader;
+
     model_king = LoadModel("assets/king.obj");
+    model_king.materials[0].shader = shader;
+
     model_queen = LoadModel("assets/queen.obj");
+    model_queen.materials[0].shader = shader;
+
     model_knight = LoadModel("assets/knight.obj");
+    model_knight.materials[0].shader = shader;
 
     bb_init();
     prng_seed(time(NULL));
