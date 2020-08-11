@@ -12,9 +12,6 @@
 #include "game/event.h"
 #include "game/command_history.h"
 
-#define RLIGHTS_IMPLEMENTATION
-#include "rlights.h"
-
 #include <raylib.h>
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
@@ -31,8 +28,8 @@
 #define GLSL_VERSION            330
 #endif
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1024
+#define HEIGHT 800
 
 game_state_t game_state = {0};
 char console_buffer[500] = {0};
@@ -74,42 +71,57 @@ Camera3D camera_init()
 
 void game_board_pieces_draw(int piece, Vector3 position)
 {
+    Matrix rotation_matrix = MatrixRotateY(PI);
+    Matrix original_matrix = MatrixRotateY(0);
+
     switch (piece)
     {
         case PWN_B:
-            DrawModel(model_pawn, position, 0.015f, DARKGRAY);
+            model_pawn.transform = original_matrix;
+            DrawModel(model_pawn, position, 0.015f, BLACK);
             break;
         case PWN_W:
+            model_pawn.transform = rotation_matrix;
             DrawModel(model_pawn, position, 0.015f, WHITE);
             break;
         case TWR_W:
+            model_rook.transform = rotation_matrix;
             DrawModel(model_rook, position, 0.015f, WHITE);
             break;
         case TWR_B:
-            DrawModel(model_rook, position, 0.015f, DARKGRAY);
+            model_rook.transform = original_matrix;
+            DrawModel(model_rook, position, 0.015f, BLACK);
             break;
         case BSP_B:
-            DrawModel(model_bishop, position, 0.015f, DARKGRAY);
+            model_bishop.transform = original_matrix;
+            DrawModel(model_bishop, position, 0.015f, BLACK);
             break;
         case BSP_W:
+            model_bishop.transform = rotation_matrix;
             DrawModel(model_bishop, position, 0.015f, WHITE);
             break;
         case KGT_W:
+            model_knight.transform = rotation_matrix;
             DrawModel(model_knight, position, 0.015f, WHITE);
             break;
         case KGT_B:
-            DrawModel(model_knight, position, 0.015f, DARKGRAY);
+            model_knight.transform = original_matrix;
+            DrawModel(model_knight, position, 0.015f, BLACK);
             break;
         case KNG_B:
-            DrawModel(model_king, position, 0.015f, DARKGRAY);
+            model_king.transform = original_matrix;
+            DrawModel(model_king, position, 0.015f, BLACK);
             break;
         case KNG_W:
+            model_king.transform = rotation_matrix;
             DrawModel(model_king, position, 0.015f, WHITE);
             break;
         case QEN_B:
-            DrawModel(model_queen, position, 0.015f, DARKGRAY);
+            model_queen.transform = original_matrix;
+            DrawModel(model_queen, position, 0.015f, BLACK);
             break;
         case QEN_W:
+            model_queen.transform = rotation_matrix;
             DrawModel(model_queen, position, 0.015f, WHITE);
             break;
         default:
@@ -189,11 +201,31 @@ void update_frame(void)
     
     BeginDrawing();
     {
+        if(IsKeyDown(KEY_A)) game_state.light1.position.x -= 0.1f;
+        if(IsKeyDown(KEY_D)) game_state.light1.position.x += 0.1f;
+
+        if(IsKeyDown(KEY_W)) game_state.light1.position.y -= 0.1f;
+        if(IsKeyDown(KEY_S)) game_state.light1.position.y += 0.1f;
+
+        if(IsKeyDown(KEY_J)) game_state.light2.position.x -= 0.1f;
+        if(IsKeyDown(KEY_L)) game_state.light2.position.x += 0.1f;
+
+        if(IsKeyDown(KEY_I)) game_state.light2.position.y -= 0.1f;
+        if(IsKeyDown(KEY_K)) game_state.light2.position.y += 0.1f;
+
+        printf("position light 1: z: %.2f x: %.2f\n", game_state.light1.position.x, game_state.light1.position.z);
+        printf("position light 2: z: %.2f x: %.2f\n", game_state.light2.position.x, game_state.light2.position.z);
+
+        UpdateLightValues(game_state.shader, game_state.light1);
+        UpdateLightValues(game_state.shader, game_state.light2);
+
         ClearBackground(BLUE);
         {
             static unsigned int draw_console = false;
             BeginMode3D(game_state.camera);
             {
+                DrawSphere(game_state.light1.position, 0.1f, RED);
+                DrawSphere(game_state.light2.position, 0.1f, GREEN);
                 game_board_draw(&game_state);
                 selector_draw(&game_state);
             }
@@ -210,8 +242,6 @@ void update_frame(void)
     }
     EndDrawing();
 }
-
-Shader shader = {0};
 
 int main(void)
 {
@@ -236,39 +266,39 @@ int main(void)
     game_state.camera = camera_init();
 
 
-    shader = LoadShader(FormatText("./assets/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
+    game_state.shader = LoadShader(FormatText("./assets/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
                                FormatText("./assets/shaders/glsl%i/lighting.fs", GLSL_VERSION));
 
-    shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(shader, "matModel");
-    shader.locs[LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+    game_state.shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(game_state.shader, "matModel");
+    game_state.shader.locs[LOC_VECTOR_VIEW] = GetShaderLocation(game_state.shader, "viewPos");
 
-    int ambientLoc = GetShaderLocation(shader, "ambient");
-    SetShaderValue(shader, ambientLoc, (float[4]){ 0.2f, 0.2f, 0.2f, 1.0f }, UNIFORM_VEC4);
+    int ambientLoc = GetShaderLocation(game_state.shader, "ambient");
+    SetShaderValue(game_state.shader, ambientLoc, (float[4]){ 0.2f, 0.2f, 0.2f, 1.0f }, UNIFORM_VEC4);
 
-    Light light_1 = CreateLight(LIGHT_POINT, (Vector3){ 0, 4, 4 }, Vector3Zero(), GRAY, shader);
-    Light light_2 = CreateLight(LIGHT_POINT, (Vector3){ 8, 15, 4 }, Vector3Zero(), GRAY, shader);
-    // Light light_3 = CreateLight(LIGHT_POINT, (Vector3){ 5, 5, 5 }, Vector3Zero(), PURPLE, shader);
-    UpdateLightValues(shader, light_1);
-    UpdateLightValues(shader, light_2);
-    // UpdateLightValues(shader, light_3);
+    game_state.light1 = CreateLight(LIGHT_POINT, (Vector3){ 6.7f, 4, 6.4f }, Vector3Zero(), GRAY, game_state.shader);
+    game_state.light2 = CreateLight(LIGHT_POINT, (Vector3){ .2f, 4, 5.1f }, Vector3Zero(), GRAY, game_state.shader);
+    game_state.light3 = CreateLight(LIGHT_POINT, (Vector3){ 4.0f, 4, 11.0f }, Vector3Zero(), GRAY, game_state.shader);
+    UpdateLightValues(game_state.shader, game_state.light1);
+    UpdateLightValues(game_state.shader, game_state.light2);
+    UpdateLightValues(game_state.shader, game_state.light3);
     
     model_bishop = LoadModel("assets/bishop.obj");
-    model_bishop.materials[0].shader = shader;
+    model_bishop.materials[0].shader = game_state.shader;
 
     model_rook = LoadModel("assets/rook.obj");
-    model_rook.materials[0].shader = shader;
+    model_rook.materials[0].shader = game_state.shader;
 
     model_pawn = LoadModel("assets/pawn.obj");
-    model_pawn.materials[0].shader = shader;
+    model_pawn.materials[0].shader = game_state.shader;
 
     model_king = LoadModel("assets/king.obj");
-    model_king.materials[0].shader = shader;
+    model_king.materials[0].shader = game_state.shader;
 
     model_queen = LoadModel("assets/queen.obj");
-    model_queen.materials[0].shader = shader;
+    model_queen.materials[0].shader = game_state.shader;
 
     model_knight = LoadModel("assets/knight.obj");
-    model_knight.materials[0].shader = shader;
+    model_knight.materials[0].shader = game_state.shader;
 
     bb_init();
     prng_seed(time(NULL));

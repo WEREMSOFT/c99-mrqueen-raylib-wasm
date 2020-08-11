@@ -10,6 +10,7 @@
 
 void setUp(void)
 {
+    queue_init();
     // printf("This is run before EACH TEST\n");
 }
 

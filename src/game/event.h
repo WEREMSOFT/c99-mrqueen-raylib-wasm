@@ -27,6 +27,7 @@ typedef struct event_queue_t {
 
 static event_queue_t events = {0};
 
+void queue_init();
 bool queue_is_empty();
 bool queue_is_full();
 int event_queue(event_t event);

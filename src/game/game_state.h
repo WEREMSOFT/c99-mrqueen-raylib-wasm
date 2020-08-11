@@ -3,6 +3,8 @@
 
 #include <raylib.h>
 #include "types.h"
+#define RLIGHTS_IMPLEMENTATION
+#include "rlights.h"
 
 const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B, KGT_B, TWR_B},
                             {PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B},
@@ -31,6 +33,10 @@ typedef struct game_state_t
     unsigned int board[8][8];
     char textBoxText[1000];
     Camera3D camera;
+    Light light1;
+    Light light2;
+    Light light3;
+    Shader shader;
     selector_t selector;
 } game_state_t;
 
