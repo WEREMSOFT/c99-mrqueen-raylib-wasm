@@ -191,41 +191,20 @@ void update_frame(void)
                 break;
             case EVENT_LOG:
                 snprintf(console_buffer, 500, "%s", event.data);
-                printf("=> %s\n", event.data);
+                printf("info: %s", event.data);
                 break;
             default:
                 printf("Unknow event: %s\n", event.data);
         }
-        printf("command history: %s\n", command_history_get_buffer());
     }
     
     BeginDrawing();
     {
-        if(IsKeyDown(KEY_A)) game_state.light1.position.x -= 0.1f;
-        if(IsKeyDown(KEY_D)) game_state.light1.position.x += 0.1f;
-
-        if(IsKeyDown(KEY_W)) game_state.light1.position.y -= 0.1f;
-        if(IsKeyDown(KEY_S)) game_state.light1.position.y += 0.1f;
-
-        if(IsKeyDown(KEY_J)) game_state.light2.position.x -= 0.1f;
-        if(IsKeyDown(KEY_L)) game_state.light2.position.x += 0.1f;
-
-        if(IsKeyDown(KEY_I)) game_state.light2.position.y -= 0.1f;
-        if(IsKeyDown(KEY_K)) game_state.light2.position.y += 0.1f;
-
-        printf("position light 1: z: %.2f x: %.2f\n", game_state.light1.position.x, game_state.light1.position.z);
-        printf("position light 2: z: %.2f x: %.2f\n", game_state.light2.position.x, game_state.light2.position.z);
-
-        UpdateLightValues(game_state.shader, game_state.light1);
-        UpdateLightValues(game_state.shader, game_state.light2);
-
         ClearBackground(BLUE);
         {
             static unsigned int draw_console = false;
             BeginMode3D(game_state.camera);
             {
-                DrawSphere(game_state.light1.position, 0.1f, RED);
-                DrawSphere(game_state.light2.position, 0.1f, GREEN);
                 game_board_draw(&game_state);
                 selector_draw(&game_state);
             }
