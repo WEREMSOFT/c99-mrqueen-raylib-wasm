@@ -12,6 +12,11 @@
 #include "game/event.h"
 #include "game/command_history.h"
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include <imconfig.h>
+#include <cimgui.h>
+#include "cimgui_impl_raylib.h"
+
 #include <raylib.h>
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
@@ -41,6 +46,7 @@ Model model_knight = {0};
 Model model_king = {0};
 Model model_queen = {0};
 
+ImDrawData *draw_data;
 
 void console_draw()
 {
@@ -163,6 +169,10 @@ void in_game_ui_draw(game_state_t* game_state){
 void update_frame(void)
 {
     UpdateCamera(&game_state.camera);
+    ImGui_ImplRaylib_NewFrame();
+    ImGui_ImplRaylib_ProcessEvent();
+    igNewFrame();
+
     event_t event = {0};
     while((event = event_dequeue()).type)
     {
@@ -209,7 +219,50 @@ void update_frame(void)
                 selector_draw(&game_state);
             }
             EndMode3D();
-            in_game_ui_draw(&game_state);
+            //in_game_ui_draw(&game_state);
+
+            //################################################
+
+
+            if (igBeginMainMenuBar())
+            {
+                if (igBeginMenu("File", true))
+                {
+                    if(igMenuItemBool("New Game", "CTRL+N", false, true)){
+                        parse_line(commands[UCI]);
+                        parse_line(commands[UCINEWGAME]);
+                        parse_line((char *)&commands[ISREADY]);
+                        game_board_reset(&game_state);
+                        char *history_buffer = command_history_get_buffer();
+                        memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
+                    };
+                    if(igMenuItemBool("Quit", "CTRL+X", false, true)){
+                        CloseWindow();
+                    };
+                    igEndMenu();
+                }
+                if (igBeginMenu("Edit", true))
+                {
+                    if (igMenuItemBool("Undo", "CTRL+Z", false, true)) {}
+                    if (igMenuItemBool("Redo", "CTRL+Y", false, true)) {}  // Disabled item
+                    igSeparator();
+                    if (igMenuItemBool("Cut", "CTRL+X", false, true)) {}
+                    if (igMenuItemBool("Copy", "CTRL+C", false, true)) {}
+                    if (igMenuItemBool("Paste", "CTRL+V", false, true)) {}
+                    igEndMenu();
+                }
+                igEndMainMenuBar();
+            }
+
+            //###############################################
+
+
+
+            
+            igRender();
+            draw_data = igGetDrawData();
+            raylib_render_cimgui(draw_data);
+
             if (IsKeyPressed(KEY_TAB))
                 draw_console = !draw_console;
             if (draw_console)
@@ -244,6 +297,33 @@ int main(void)
     SetTargetFPS(60);
     game_state.camera = camera_init();
 
+
+// cimgui variables
+    struct ImGuiContext *ctx;
+    struct ImGuiIO *io;
+
+    // Initialize imgui
+    igCreateContext(NULL);
+    igStyleColorsDark(NULL);
+    // Initialize keyboard and mouse events
+    ImGui_ImplRaylib_Init();
+
+    // Create textures
+
+    // Build and load the texture atlas into a texture
+    // (In the examples/ app this is usually done within the ImGui_ImplXXX_Init() function from one of the demo Renderer)
+    io = igGetIO();
+    unsigned char *pixels = NULL;
+
+    int width = WIDTH;
+    int height = HEIGHT;
+    ImFontAtlas_GetTexDataAsRGBA32(io->Fonts, &pixels, &width, &height, NULL);
+    // At this point you've got the texture data and you need to upload that your your graphic system:
+    // After we have created the texture, store its pointer/identifier (_in whichever format your engine uses_) in 'io.Fonts->TexID'.
+    // This will be passed back to your via the renderer. Basically ImTextureID == void*. Read FAQ for details about ImTextureID.
+    Image image = LoadImageEx(pixels, width, height);
+    Texture2D texture = LoadTextureFromImage(image); //MyEngine::CreateTextureFromMemoryPixels(pixels, width, height, TEXTURE_TYPE_RGBA32)
+    io->Fonts->TexID = (void *)&texture.id;
 
     game_state.shader = LoadShader(FormatText("./assets/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
                                FormatText("./assets/shaders/glsl%i/lighting.fs", GLSL_VERSION));

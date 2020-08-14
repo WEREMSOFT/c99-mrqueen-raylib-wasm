@@ -53,7 +53,7 @@ EMSC_CC_COMMAND := $(EMSC_CC) $(EMSC_CFLAGS) $(INCLUDE_D) $(STATIC_LIBS_D)
 #//////////////////////////////////////////////////
 
 ifeq ($(DETTECTED_OS),Linux)
-	LINK_LIBS := -l:libraylib.a -lm -ldl -lpthread -lX11 -lxcb -lGL -lGLX -lXext -lGLdispatch -lXau -lXdmcp
+	LINK_LIBS := -l:libraylib.a -l:libcimgui_static.a -l:libglfw3.a -lstdc++ -lm -ldl -lpthread -lX11 -lxcb -lGL -lGLX -lXext -lGLdispatch -lXau -lXdmcp
 	TEST_LINK_LIBS := -lunity 
 	#LINK_LIBS := -l:libraylib-linux.a -l:libglfw3.a -lm -ldl -lpthread -lX11 -lxcb -lGL -lGLX -lXext -lGLdispatch -lXau -lXdmcp
 else ifeq ($(DETTECTED_OS),Darwin)
