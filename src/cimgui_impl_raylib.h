@@ -49,6 +49,7 @@ bool ImGui_ImplRaylib_Init()
     io->KeyMap[ImGuiKey_X] = KEY_X;
     io->KeyMap[ImGuiKey_Y] = KEY_Y;
     io->KeyMap[ImGuiKey_Z] = KEY_Z;
+    io->KeyMap[ImGuiKeyModFlags_Ctrl] = KEY_LEFT_CONTROL;
 
     io->MousePos = (ImVec2){-FLT_MAX, -FLT_MAX};
     io->SetClipboardTextFn = ImGui_ImplRaylib_SetClipboardText;
