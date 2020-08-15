@@ -13,17 +13,12 @@
 #include "game/command_history.h"
 #include "game/game_board.h"
 #include "game/gui_system.h"
+#include "game/light_system.h"
 
 #include <raylib.h>
 
 #ifdef OS_WEB
 #include <emscripten/emscripten.h>
-#endif
-
-#if defined(OS_WEB)
-#define GLSL_VERSION            100
-#else   // PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
-#define GLSL_VERSION            330
 #endif
 
 #define WIDTH 1024
@@ -128,48 +123,10 @@ int main(void)
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
     game_state.camera = camera_init();
-
-    // #####################################################
-    // cimgui variables
-    struct ImGuiContext *ctx;
-    struct ImGuiIO *io;
-
+    
     gui_init(WIDTH, HEIGHT);
-
-    // Create textures
-
-    // Build and load the texture atlas into a texture
-    // (In the examples/ app this is usually done within the ImGui_ImplXXX_Init() function from one of the demo Renderer)
-    io = igGetIO();
-    unsigned char *pixels = NULL;
-
-    int width = WIDTH;
-    int height = HEIGHT;
-    ImFontAtlas_GetTexDataAsRGBA32(io->Fonts, &pixels, &width, &height, NULL);
-    // At this point you've got the texture data and you need to upload that your your graphic system:
-    // After we have created the texture, store its pointer/identifier (_in whichever format your engine uses_) in 'io.Fonts->TexID'.
-    // This will be passed back to your via the renderer. Basically ImTextureID == void*. Read FAQ for details about ImTextureID.
-    Image image = LoadImageEx(pixels, width, height);
-    Texture2D texture = LoadTextureFromImage(image); //MyEngine::CreateTextureFromMemoryPixels(pixels, width, height, TEXTURE_TYPE_RGBA32)
-    io->Fonts->TexID = (void *)&texture.id;
-
-    // #####################################################
-
-    game_state.shader = LoadShader(FormatText("./assets/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
-                               FormatText("./assets/shaders/glsl%i/lighting.fs", GLSL_VERSION));
-
-    game_state.shader.locs[LOC_MATRIX_MODEL] = GetShaderLocation(game_state.shader, "matModel");
-    game_state.shader.locs[LOC_VECTOR_VIEW] = GetShaderLocation(game_state.shader, "viewPos");
-
-    int ambientLoc = GetShaderLocation(game_state.shader, "ambient");
-    SetShaderValue(game_state.shader, ambientLoc, (float[4]){ 0.2f, 0.2f, 0.2f, 1.0f }, UNIFORM_VEC4);
-
-    game_state.light1 = CreateLight(LIGHT_POINT, (Vector3){ 6.7f, 4, 6.4f }, Vector3Zero(), GRAY, game_state.shader);
-    game_state.light2 = CreateLight(LIGHT_POINT, (Vector3){ .2f, 4, 5.1f }, Vector3Zero(), GRAY, game_state.shader);
-    game_state.light3 = CreateLight(LIGHT_POINT, (Vector3){ 4.0f, 4, 11.0f }, Vector3Zero(), GRAY, game_state.shader);
-    UpdateLightValues(game_state.shader, game_state.light1);
-    UpdateLightValues(game_state.shader, game_state.light2);
-    UpdateLightValues(game_state.shader, game_state.light3);
+    
+    lights_init(&game_state);
     
     game_board_models_load(&game_state);
 
@@ -185,7 +142,8 @@ int main(void)
         update_frame();
     }
 #endif
-    CloseWindow();
+    gui_fini();
     command_history_fini();
+    CloseWindow();
     return 0;
 }
