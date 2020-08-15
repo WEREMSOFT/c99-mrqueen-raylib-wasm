@@ -11,11 +11,13 @@
 #include "game/selector.h"
 #include "game/event.h"
 #include "game/command_history.h"
+#include "game/game_board.h"
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include <imconfig.h>
 #include <cimgui.h>
 #include "cimgui_impl_raylib.h"
+
 
 #include <raylib.h>
 #define RAYGUI_IMPLEMENTATION
@@ -38,13 +40,6 @@
 
 game_state_t game_state = {0};
 char console_buffer[500] = {0};
-
-Model model_bishop = {0};
-Model model_rook = {0};
-Model model_pawn = {0};
-Model model_knight = {0};
-Model model_king = {0};
-Model model_queen = {0};
 
 ImDrawData *draw_data;
 
@@ -73,66 +68,6 @@ Camera3D camera_init()
     return_value.position = (Vector3){3.5f, 6.0f, 13.0f};
     SetCameraMode(return_value, CAMERA_FREE);
     return return_value;
-}
-
-void game_board_pieces_draw(int piece, Vector3 position)
-{
-    Matrix rotation_matrix = MatrixRotateY(PI);
-    Matrix original_matrix = MatrixRotateY(0);
-
-    switch (piece)
-    {
-        case PWN_B:
-            model_pawn.transform = original_matrix;
-            DrawModel(model_pawn, position, 0.015f, BLACK);
-            break;
-        case PWN_W:
-            model_pawn.transform = rotation_matrix;
-            DrawModel(model_pawn, position, 0.015f, WHITE);
-            break;
-        case TWR_W:
-            model_rook.transform = rotation_matrix;
-            DrawModel(model_rook, position, 0.015f, WHITE);
-            break;
-        case TWR_B:
-            model_rook.transform = original_matrix;
-            DrawModel(model_rook, position, 0.015f, BLACK);
-            break;
-        case BSP_B:
-            model_bishop.transform = original_matrix;
-            DrawModel(model_bishop, position, 0.015f, BLACK);
-            break;
-        case BSP_W:
-            model_bishop.transform = rotation_matrix;
-            DrawModel(model_bishop, position, 0.015f, WHITE);
-            break;
-        case KGT_W:
-            model_knight.transform = rotation_matrix;
-            DrawModel(model_knight, position, 0.015f, WHITE);
-            break;
-        case KGT_B:
-            model_knight.transform = original_matrix;
-            DrawModel(model_knight, position, 0.015f, BLACK);
-            break;
-        case KNG_B:
-            model_king.transform = original_matrix;
-            DrawModel(model_king, position, 0.015f, BLACK);
-            break;
-        case KNG_W:
-            model_king.transform = rotation_matrix;
-            DrawModel(model_king, position, 0.015f, WHITE);
-            break;
-        case QEN_B:
-            model_queen.transform = original_matrix;
-            DrawModel(model_queen, position, 0.015f, BLACK);
-            break;
-        case QEN_W:
-            model_queen.transform = rotation_matrix;
-            DrawModel(model_queen, position, 0.015f, WHITE);
-            break;
-        default:
-            break;
-    }
 }
 
 void game_board_draw(game_state_t *game_state)
@@ -341,23 +276,23 @@ int main(void)
     UpdateLightValues(game_state.shader, game_state.light2);
     UpdateLightValues(game_state.shader, game_state.light3);
     
-    model_bishop = LoadModel("assets/bishop.obj");
-    model_bishop.materials[0].shader = game_state.shader;
+    models[MODEL_BISHOP] = LoadModel("assets/bishop.obj");
+    models[MODEL_BISHOP].materials[0].shader = game_state.shader;
 
-    model_rook = LoadModel("assets/rook.obj");
-    model_rook.materials[0].shader = game_state.shader;
+    models[MODEL_ROOK] = LoadModel("assets/rook.obj");
+    models[MODEL_ROOK].materials[0].shader = game_state.shader;
 
-    model_pawn = LoadModel("assets/pawn.obj");
-    model_pawn.materials[0].shader = game_state.shader;
+    models[MODEL_PAWN] = LoadModel("assets/pawn.obj");
+    models[MODEL_PAWN].materials[0].shader = game_state.shader;
 
-    model_king = LoadModel("assets/king.obj");
-    model_king.materials[0].shader = game_state.shader;
+    models[MODEL_KING] = LoadModel("assets/king.obj");
+    models[MODEL_KING].materials[0].shader = game_state.shader;
 
-    model_queen = LoadModel("assets/queen.obj");
-    model_queen.materials[0].shader = game_state.shader;
+    models[MODEL_QUEEN] = LoadModel("assets/queen.obj");
+    models[MODEL_QUEEN].materials[0].shader = game_state.shader;
 
-    model_knight = LoadModel("assets/knight.obj");
-    model_knight.materials[0].shader = game_state.shader;
+    models[MODEL_KNIGHT] = LoadModel("assets/knight.obj");
+    models[MODEL_KNIGHT].materials[0].shader = game_state.shader;
 
     bb_init();
     prng_seed(time(NULL));
