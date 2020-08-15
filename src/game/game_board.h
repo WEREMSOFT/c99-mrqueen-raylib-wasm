@@ -1,5 +1,8 @@
 #ifndef __GAME_BOARD_H__
 #define __GAME_BOARD_H__
+#include <raygui.h>
+#include "game_state.h"
+
 
 enum ModelsEnum{
     MODEL_PAWN,
@@ -70,6 +73,41 @@ void game_board_pieces_draw(int piece, Vector3 position)
             break;
         default:
             break;
+    }
+}
+
+void game_board_models_load(game_state_t* game_state){
+    models[MODEL_BISHOP] = LoadModel("assets/bishop.obj");
+    models[MODEL_BISHOP].materials[0].shader = game_state->shader;
+
+    models[MODEL_ROOK] = LoadModel("assets/rook.obj");
+    models[MODEL_ROOK].materials[0].shader = game_state->shader;
+
+    models[MODEL_PAWN] = LoadModel("assets/pawn.obj");
+    models[MODEL_PAWN].materials[0].shader = game_state->shader;
+
+    models[MODEL_KING] = LoadModel("assets/king.obj");
+    models[MODEL_KING].materials[0].shader = game_state->shader;
+
+    models[MODEL_QUEEN] = LoadModel("assets/queen.obj");
+    models[MODEL_QUEEN].materials[0].shader = game_state->shader;
+
+    models[MODEL_KNIGHT] = LoadModel("assets/knight.obj");
+    models[MODEL_KNIGHT].materials[0].shader = game_state->shader;
+}
+
+void game_board_draw(game_state_t *game_state)
+{
+    float offsetX = 0.0f;
+    float offsetZ = 0.0f;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            Vector3 pos = (Vector3){i + offsetX, -0.5f, j + offsetZ};
+            game_board_pieces_draw(game_state->board[j][i], pos);
+            DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : WHITE);
+        }
     }
 }
 

@@ -12,18 +12,9 @@
 #include "game/event.h"
 #include "game/command_history.h"
 #include "game/game_board.h"
-
-#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
-#include <imconfig.h>
-#include <cimgui.h>
-#include "cimgui_impl_raylib.h"
-
+#include "game/gui_system.h"
 
 #include <raylib.h>
-#define RAYGUI_IMPLEMENTATION
-#define RAYGUI_SUPPORT_ICONS
-#include <raygui.h>
-#undef RAYGUI_IMPLEMENTATION
 
 #ifdef OS_WEB
 #include <emscripten/emscripten.h>
@@ -39,23 +30,6 @@
 #define HEIGHT 800
 
 game_state_t game_state = {0};
-char console_buffer[500] = {0};
-
-ImDrawData *draw_data;
-
-void console_draw()
-{
-    static char command[100] = {0};
-    
-    GuiDrawRectangle((Rectangle){0, 0, 800, 400}, 1, DARKGRAY, LIGHTGRAY);
-    GuiTextBoxMulti((Rectangle){10, 10, 780, 300}, console_buffer, 10000, false);
-    GuiTextBox((Rectangle){10, 315, 780, 30}, command, 100, true);
-    if (GuiButton((Rectangle){10, 355, 125, 30}, GuiIconText(RICON_200, "Send Command")) || IsKeyPressed(KEY_ENTER))
-    {
-        parse_line(command);
-        command[0] = '\0';
-    }
-}
 
 Camera3D camera_init()
 {
@@ -70,35 +44,8 @@ Camera3D camera_init()
     return return_value;
 }
 
-void game_board_draw(game_state_t *game_state)
-{
-    float offsetX = 0.0f;
-    float offsetZ = 0.0f;
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            Vector3 pos = (Vector3){i + offsetX, -0.5f, j + offsetZ};
-            game_board_pieces_draw(game_state->board[j][i], pos);
-            DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : WHITE);
-        }
-    }
-}
-
 void game_board_reset(game_state_t* game_state){
     memcpy(game_state->board, base_board, sizeof(game_state->board));
-}
-
-void in_game_ui_draw(game_state_t* game_state){
-    if (GuiButton((Rectangle){10, 10, 125, 30}, GuiIconText(RICON_NONE, "New Game")))
-    {
-        parse_line(commands[UCI]);
-        parse_line(commands[UCINEWGAME]);
-        parse_line((char *)&commands[ISREADY]);
-        game_board_reset(game_state);
-        char *history_buffer = command_history_get_buffer();
-        memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
-    }
 }
 
 void update_frame(void)
@@ -135,7 +82,6 @@ void update_frame(void)
                 command_history_add_command(event.data);
                 break;
             case EVENT_LOG:
-                snprintf(console_buffer, 500, "%s", event.data);
                 printf("info: %s", event.data);
                 break;
             default:
@@ -154,56 +100,7 @@ void update_frame(void)
                 selector_draw(&game_state);
             }
             EndMode3D();
-            //in_game_ui_draw(&game_state);
-
-            //################################################
-
-
-            if (igBeginMainMenuBar())
-            {
-                if (igBeginMenu("File", true))
-                {
-                    if(igMenuItemBool("New Game", "CTRL+N", false, true)){
-                        parse_line(commands[UCI]);
-                        parse_line(commands[UCINEWGAME]);
-                        parse_line((char *)&commands[ISREADY]);
-                        game_board_reset(&game_state);
-                        char *history_buffer = command_history_get_buffer();
-                        memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
-                    };
-                    if(igMenuItemBool("Quit", "CTRL+X", false, true)){
-                        CloseWindow();
-                    };
-                    igEndMenu();
-                }
-                if (igBeginMenu("Edit", true))
-                {
-                    if (igMenuItemBool("Undo", "CTRL+Z", false, true)) {}
-                    if (igMenuItemBool("Redo", "CTRL+Y", false, true)) {}  // Disabled item
-                    igSeparator();
-                    if (igMenuItemBool("Cut", "CTRL+X", false, true)) {}
-                    if (igMenuItemBool("Copy", "CTRL+C", false, true)) {}
-                    if (igMenuItemBool("Paste", "CTRL+V", false, true)) {}
-                    igEndMenu();
-                }
-                igEndMainMenuBar();
-            }
-
-            //###############################################
-
-
-
-            
-            igRender();
-            draw_data = igGetDrawData();
-            raylib_render_cimgui(draw_data);
-
-            if (IsKeyPressed(KEY_TAB))
-                draw_console = !draw_console;
-            if (draw_console)
-            {
-                console_draw();
-            }
+            gui_draw(&game_state);           
         }
         DrawFPS(700, 10);
     }
@@ -232,16 +129,12 @@ int main(void)
     SetTargetFPS(60);
     game_state.camera = camera_init();
 
-
-// cimgui variables
+    // #####################################################
+    // cimgui variables
     struct ImGuiContext *ctx;
     struct ImGuiIO *io;
 
-    // Initialize imgui
-    igCreateContext(NULL);
-    igStyleColorsDark(NULL);
-    // Initialize keyboard and mouse events
-    ImGui_ImplRaylib_Init();
+    gui_init(WIDTH, HEIGHT);
 
     // Create textures
 
@@ -260,6 +153,8 @@ int main(void)
     Texture2D texture = LoadTextureFromImage(image); //MyEngine::CreateTextureFromMemoryPixels(pixels, width, height, TEXTURE_TYPE_RGBA32)
     io->Fonts->TexID = (void *)&texture.id;
 
+    // #####################################################
+
     game_state.shader = LoadShader(FormatText("./assets/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
                                FormatText("./assets/shaders/glsl%i/lighting.fs", GLSL_VERSION));
 
@@ -276,23 +171,7 @@ int main(void)
     UpdateLightValues(game_state.shader, game_state.light2);
     UpdateLightValues(game_state.shader, game_state.light3);
     
-    models[MODEL_BISHOP] = LoadModel("assets/bishop.obj");
-    models[MODEL_BISHOP].materials[0].shader = game_state.shader;
-
-    models[MODEL_ROOK] = LoadModel("assets/rook.obj");
-    models[MODEL_ROOK].materials[0].shader = game_state.shader;
-
-    models[MODEL_PAWN] = LoadModel("assets/pawn.obj");
-    models[MODEL_PAWN].materials[0].shader = game_state.shader;
-
-    models[MODEL_KING] = LoadModel("assets/king.obj");
-    models[MODEL_KING].materials[0].shader = game_state.shader;
-
-    models[MODEL_QUEEN] = LoadModel("assets/queen.obj");
-    models[MODEL_QUEEN].materials[0].shader = game_state.shader;
-
-    models[MODEL_KNIGHT] = LoadModel("assets/knight.obj");
-    models[MODEL_KNIGHT].materials[0].shader = game_state.shader;
+    game_board_models_load(&game_state);
 
     bb_init();
     prng_seed(time(NULL));
