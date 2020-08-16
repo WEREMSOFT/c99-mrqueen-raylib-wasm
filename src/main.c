@@ -39,16 +39,10 @@ Camera3D camera_init()
     return return_value;
 }
 
-void game_board_reset(game_state_t* game_state){
-    memcpy(game_state->board, base_board, sizeof(game_state->board));
-}
-
 void update_frame(void)
 {
     UpdateCamera(&game_state.camera);
-    ImGui_ImplRaylib_NewFrame();
-    ImGui_ImplRaylib_ProcessEvent();
-    igNewFrame();
+    ui_pre_frame_update();
 
     event_t event = {0};
     while((event = event_dequeue()).type)
@@ -56,12 +50,13 @@ void update_frame(void)
         switch(event.type){
             case EVENT_RESPONSE:
                 printf("position sent %s", event.data);
-                move_piece(event.data, &game_state);
+                game_board_move_piece(event.data, &game_state);
                 command_history_add_command(" ");
                 command_history_add_command(event.data);
+                selector_pass_to_state_ready(&game_state.selector);
             break;
             case EVENT_COMMAND:
-                move_piece(event.data, &game_state);
+                game_board_move_piece(event.data, &game_state);
                 char command_as_string[300] = {0};
 
                 snprintf(command_as_string, 

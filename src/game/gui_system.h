@@ -6,6 +6,7 @@
 #include <cimgui.h>
 #include "cimgui_impl_raylib.h"
 #include "game_state.h"
+#include "game_board.h"
 
 ImDrawData *draw_data;
 Image image = {0};
@@ -54,7 +55,7 @@ void gui_draw(game_state_t* game_state){
                 parse_line(commands[UCI]);
                 parse_line(commands[UCINEWGAME]);
                 parse_line((char *)&commands[ISREADY]);
-                game_board_reset(&game_state);
+                game_board_reset(game_state);
                 char *history_buffer = command_history_get_buffer();
                 memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
             };
@@ -79,6 +80,12 @@ void gui_draw(game_state_t* game_state){
     igRender();
     draw_data = igGetDrawData();
     raylib_render_cimgui(draw_data);
+}
+
+void ui_pre_frame_update(){
+    ImGui_ImplRaylib_NewFrame();
+    ImGui_ImplRaylib_ProcessEvent();
+    igNewFrame();
 }
 
 

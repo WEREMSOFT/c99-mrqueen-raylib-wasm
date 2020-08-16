@@ -1,8 +1,11 @@
 #ifndef __GAME_BOARD_H__
 #define __GAME_BOARD_H__
+#include <stdbool.h>
 #include <raygui.h>
 #include "game_state.h"
 
+static char board_coord_x[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+static char board_coord_y[8] = {'8', '7', '6', '5', '4', '3', '2', '1'};
 
 enum ModelsEnum{
     MODEL_PAWN,
@@ -15,6 +18,26 @@ enum ModelsEnum{
 };
 
 Model models[MODEL_COUNT] = {0};
+
+bool game_board_position_contains_white_piece(game_state_t* game_state){
+    unsigned int piece = game_state->board[(int)(game_state->selector.position.z)][(int)(game_state->selector.position.x)];
+    return  piece > 6;
+}
+
+void game_board_move_piece(char *coords, game_state_t* game_state)
+{
+   unsigned int board_index_cource_x = (unsigned int)(strchr(board_coord_x, coords[0]) - board_coord_x);
+   unsigned int board_index_cource_y = (unsigned int)(strchr(board_coord_y, coords[1]) - board_coord_y);
+   unsigned int board_index_target_x = (unsigned int)(strchr(board_coord_x, coords[2]) - board_coord_x);
+   unsigned int board_index_target_y = (unsigned int)(strchr(board_coord_y, coords[3]) - board_coord_y);
+
+   game_state->board[board_index_target_y][board_index_target_x] = game_state->board[board_index_cource_y][board_index_cource_x];
+   game_state->board[board_index_cource_y][board_index_cource_x] = EMPTY;
+}
+
+void game_board_reset(game_state_t* game_state){
+    memcpy(game_state->board, base_board, sizeof(game_state->board));
+}
 
 void game_board_pieces_draw(int piece, Vector3 position)
 {

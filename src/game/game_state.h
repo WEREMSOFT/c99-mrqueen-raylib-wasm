@@ -16,11 +16,6 @@ const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B
                             {TWR_W, KGT_W, BSP_W, QEN_W, KNG_W, BSP_W, KGT_W, TWR_W},
                             };
 
-enum enum_selector_state {
-    SELECTOR_STATE_DISABLED,
-    SELECTOR_STATE_READY,
-    SELECTOR_STATE_AWAITING_TARGET,
-};
 
 typedef struct selector_t {
     Vector3 position;
