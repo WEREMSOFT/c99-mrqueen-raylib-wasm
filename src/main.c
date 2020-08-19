@@ -50,13 +50,13 @@ void update_frame(void)
         switch(event.type){
             case EVENT_RESPONSE:
                 printf("position sent %s", event.data);
-                game_board_move_piece(event.data, &game_state);
+                game_board_move_piece(game_state.board, event.data);
                 command_history_add_command(" ");
                 command_history_add_command(event.data);
                 selector_pass_to_state_ready(&game_state.selector);
             break;
             case EVENT_COMMAND:
-                game_board_move_piece(event.data, &game_state);
+                game_board_move_piece(game_state.board, event.data);
                 char command_as_string[300] = {0};
 
                 snprintf(command_as_string, 

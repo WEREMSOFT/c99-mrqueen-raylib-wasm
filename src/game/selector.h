@@ -19,6 +19,14 @@ enum enum_selector_state {
     SELECTOR_STATE_ILLEGAL,
 };
 
+void selector_get_coordinates_as_string(selector_t selector, char *result){
+    snprintf(result, 5, "%c%c%c%c", 
+        board_coord_x[(int)selector.position_start.x], 
+        board_coord_y[(int)selector.position_start.z], 
+        board_coord_x[(int)selector.position.x], 
+        board_coord_y[(int)selector.position.z]);
+}
+
 void selector_process_keys(selector_t *selector)
 {
     if (IsKeyPressed(KEY_LEFT))
@@ -42,12 +50,12 @@ void selector_process_keys(selector_t *selector)
     }
 }
 
-void selector_process_state_ready(game_state_t* game_state){
+void selector_process_state_ready(game_state_t* game_state) {
     selector_process_keys(&game_state->selector);
 
     if(IsKeyPressed(KEY_SPACE))
     {
-        if(game_board_position_contains_white_piece(game_state)){
+        if (game_board_is_position_legal(game_state->board, game_state->selector)) {
             game_state->selector.state = SELECTOR_STATE_AWAITING_TARGET;
             game_state->selector.position_start = game_state->selector.position;
         } else {
@@ -59,18 +67,10 @@ void selector_process_state_ready(game_state_t* game_state){
     DrawCubeWires(game_state->selector.position, 1, 1, 1, RED);
 }
 
-void get_board_coordinates_as_strig(char *result, selector_t selector){
-    snprintf(result, 5, "%c%c%c%c", 
-        board_coord_x[(int)selector.position_start.x], 
-        board_coord_y[(int)selector.position_start.z], 
-        board_coord_x[(int)selector.position.x], 
-        board_coord_y[(int)selector.position.z]);
-}
-
 void selector_send_move_to_engine(game_state_t* game_state)
 {
     char coordinates[5] = {0};
-    get_board_coordinates_as_strig(coordinates, game_state->selector);
+    selector_get_coordinates_as_string(game_state->selector, coordinates);
 
     event_t event = {0};
     event.type = EVENT_COMMAND;

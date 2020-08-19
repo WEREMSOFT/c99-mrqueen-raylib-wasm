@@ -19,20 +19,20 @@ enum ModelsEnum{
 
 Model models[MODEL_COUNT] = {0};
 
-bool game_board_position_contains_white_piece(game_state_t* game_state){
-    unsigned int piece = game_state->board[(int)(game_state->selector.position.z)][(int)(game_state->selector.position.x)];
+bool game_board_is_position_legal(unsigned int board[8][8], selector_t selector) {
+    unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
     return  piece > 6;
 }
 
-void game_board_move_piece(char *coords, game_state_t* game_state)
+void game_board_move_piece(unsigned int board[8][8], char *coords)
 {
    unsigned int board_index_cource_x = (unsigned int)(strchr(board_coord_x, coords[0]) - board_coord_x);
    unsigned int board_index_cource_y = (unsigned int)(strchr(board_coord_y, coords[1]) - board_coord_y);
    unsigned int board_index_target_x = (unsigned int)(strchr(board_coord_x, coords[2]) - board_coord_x);
    unsigned int board_index_target_y = (unsigned int)(strchr(board_coord_y, coords[3]) - board_coord_y);
 
-   game_state->board[board_index_target_y][board_index_target_x] = game_state->board[board_index_cource_y][board_index_cource_x];
-   game_state->board[board_index_cource_y][board_index_cource_x] = EMPTY;
+   board[board_index_target_y][board_index_target_x] = board[board_index_cource_y][board_index_cource_x];
+   board[board_index_cource_y][board_index_cource_x] = EMPTY;
 }
 
 void game_board_reset(game_state_t* game_state){
