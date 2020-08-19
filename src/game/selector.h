@@ -50,17 +50,22 @@ void selector_process_keys(selector_t *selector)
     }
 }
 
+void selector_pass_to_state_illegal(selector_t* selector){
+        selector->state = SELECTOR_STATE_ILLEGAL;
+        selector->position_start = selector->position;
+}
+
 void selector_process_state_ready(game_state_t* game_state) {
     selector_process_keys(&game_state->selector);
 
     if(IsKeyPressed(KEY_SPACE))
     {
-        if (game_board_is_position_legal(game_state->board, game_state->selector)) {
+        if (game_board_is_origin_position_legal(game_state->board, game_state->selector)) {
             game_state->selector.state = SELECTOR_STATE_AWAITING_TARGET;
             game_state->selector.position_start = game_state->selector.position;
+            game_state->selector.origin_piece = game_state->board[(int)game_state->selector.position.z][(int)game_state->selector.position.x];
         } else {
-            game_state->selector.state = SELECTOR_STATE_ILLEGAL;
-            game_state->selector.position_start = game_state->selector.position;
+            selector_pass_to_state_illegal(&game_state->selector);
         }
     }
 
@@ -85,8 +90,12 @@ void selector_process_state_awaiting_target(game_state_t* game_state)
 
     if(IsKeyPressed(KEY_SPACE))
     {
-        game_state->selector.state = SELECTOR_STATE_DISABLED;
-        selector_send_move_to_engine(game_state);
+        if(game_board_is_target_position_legal(game_state->board, game_state->selector)){
+            game_state->selector.state = SELECTOR_STATE_DISABLED;
+            selector_send_move_to_engine(game_state);
+        } else {
+            selector_pass_to_state_illegal(&game_state->selector);
+        }
     }
 
     DrawCubeWires(game_state->selector.position, 1, 1, 1, RED);
@@ -96,6 +105,7 @@ void selector_process_state_awaiting_target(game_state_t* game_state)
 void selector_pass_to_state_ready(selector_t* selector){
     selector->state = SELECTOR_STATE_READY;
 }
+
 
 void selector_process_state_illegal(selector_t* selector){
     static bool blink = false;

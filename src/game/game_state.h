@@ -21,6 +21,7 @@ typedef struct selector_t {
     Vector3 position;
     Vector3 position_start;
     unsigned int state;
+    unsigned int origin_piece;
 } selector_t;
 
 typedef struct game_state_t 

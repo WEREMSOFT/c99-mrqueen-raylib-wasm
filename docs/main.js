@@ -69,7 +69,7 @@ Module.expectedDataFileDownloads++;
   } else {
    throw "using preloaded data can only be done on a web page or in a web worker";
   }
-  var PACKAGE_NAME = "html/main.data";
+  var PACKAGE_NAME = "docs/main.data";
   var REMOTE_PACKAGE_BASE = "main.data";
   if (typeof Module["locateFilePackage"] === "function" && !Module["locateFile"]) {
    Module["locateFile"] = Module["locateFilePackage"];
@@ -184,9 +184,9 @@ Module.expectedDataFileDownloads++;
     for (var i = 0; i < files.length; ++i) {
      DataRequest.prototype.requests[files[i].filename].onload();
     }
-    Module["removeRunDependency"]("datafile_html/main.data");
+    Module["removeRunDependency"]("datafile_docs/main.data");
    }
-   Module["addRunDependency"]("datafile_html/main.data");
+   Module["addRunDependency"]("datafile_docs/main.data");
    if (!Module.preloadResults) Module.preloadResults = {};
    Module.preloadResults[PACKAGE_NAME] = {
     fromCache: false
@@ -258,7 +258,7 @@ Module.expectedDataFileDownloads++;
    "audio": 0
   } ],
   "remote_package_size": 4612646,
-  "package_uuid": "717327fa-3e0a-4a69-801c-f7c458d81f6e"
+  "package_uuid": "9d660652-bec5-4802-8364-a59be7522b1c"
  });
 })();
 

@@ -1,10 +1,5 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
-enum enum_models
-{
-    MODEL_BOARD,
-    MODELS_COUNT
-};
 
 enum enum_pieces
 {

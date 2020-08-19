@@ -22,7 +22,7 @@ ASST_D := assets/
 TEST_SRC_D := tests/
 TEST_BLD_D := $(TEST_SRC_D)bin/
 LIBS_D := libs/
-HTML_D := html/
+HTML_D := docs/
 ASM_D := asm/
 
 SRC_FILES := $(wildcard $(SRC_D)*.c)
@@ -93,7 +93,6 @@ $(BLD_D)%.$(BIN_EXTENSION): $(SRC_FILES)
 
 $(HTML_D)%.html: $(SRC_FILES)
 	$(EMSC_CC_COMMAND) -g4 --source-map-base http://127.0.0.1:5500/html/ $^ -o $@ $(EMSC_STATIC_LIBS_D)
-	cp -r src html/src
 
 print_information:
 	@echo "Dettected OS: $(DETTECTED_OS)"

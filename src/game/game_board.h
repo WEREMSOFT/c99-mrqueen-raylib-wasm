@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <raygui.h>
 #include "game_state.h"
+#include "types.h"
 
 static char board_coord_x[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 static char board_coord_y[8] = {'8', '7', '6', '5', '4', '3', '2', '1'};
@@ -19,9 +20,30 @@ enum ModelsEnum{
 
 Model models[MODEL_COUNT] = {0};
 
-bool game_board_is_position_legal(unsigned int board[8][8], selector_t selector) {
+bool game_board_is_origin_position_legal(unsigned int board[8][8], selector_t selector) {
     unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
     return  piece > 6;
+}
+
+bool game_board_is_target_position_legal(unsigned int board[8][8], selector_t selector) {
+    if(selector.position_start.x == selector.position.x && selector.position_start.z == selector.position.z)
+        return false;
+
+    unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
+    if(piece > 6)
+        return false;
+
+    switch (selector.origin_piece)
+    {
+    case PWN_W:
+        if(selector.position_start.z <= selector.position.z)
+            return false;
+        break;
+    default:
+        break;
+    }
+
+    return true;
 }
 
 void game_board_move_piece(unsigned int board[8][8], char *coords)
