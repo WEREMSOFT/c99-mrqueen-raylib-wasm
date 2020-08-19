@@ -131,8 +131,8 @@ int main(void)
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
-    game_state.camera_perspective = camera_perspective_init();
     game_state.camera_top = camera_top_init();
+    game_state.camera_perspective = camera_perspective_init();
     
     gui_init(WIDTH, HEIGHT);
     
