@@ -28,7 +28,8 @@ typedef struct game_state_t
 {
     unsigned int board[8][8];
     char textBoxText[1000];
-    Camera3D camera;
+    Camera3D camera_perspective;
+    Camera3D camera_top;
     Light light1;
     Light light2;
     Light light3;

@@ -26,7 +26,7 @@
 
 game_state_t game_state = {0};
 
-Camera3D camera_init()
+Camera3D camera_perspective_init()
 {
     Camera3D return_value = {0};
 
@@ -39,9 +39,22 @@ Camera3D camera_init()
     return return_value;
 }
 
+Camera3D camera_top_init()
+{
+    Camera3D return_value = {0};
+
+    return_value.fovy = 45.0f;
+    return_value.target = (Vector3){0, 0, 0};
+    return_value.type = CAMERA_PERSPECTIVE;
+    return_value.up = (Vector3){0, 0, 1.0f};
+    return_value.position = (Vector3){0, 10.0f, 0.0f};
+    SetCameraMode(return_value, CAMERA_FREE);
+    return return_value;
+}
+
 void update_frame(void)
 {
-    UpdateCamera(&game_state.camera);
+    UpdateCamera(&game_state.camera_perspective);
     ui_pre_frame_update();
 
     event_t event = {0};
@@ -84,12 +97,13 @@ void update_frame(void)
         ClearBackground(BLUE);
         {
             static unsigned int draw_console = false;
-            BeginMode3D(game_state.camera);
+            BeginMode3D(game_state.camera_perspective);
             {
                 game_board_draw(&game_state);
                 selector_draw(&game_state);
             }
             EndMode3D();
+
             gui_draw(&game_state);           
         }
         DrawFPS(700, 10);
@@ -117,7 +131,8 @@ int main(void)
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
-    game_state.camera = camera_init();
+    game_state.camera_perspective = camera_perspective_init();
+    game_state.camera_top = camera_top_init();
     
     gui_init(WIDTH, HEIGHT);
     

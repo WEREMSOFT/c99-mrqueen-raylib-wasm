@@ -258,7 +258,7 @@ Module.expectedDataFileDownloads++;
    "audio": 0
   } ],
   "remote_package_size": 4612646,
-  "package_uuid": "9d660652-bec5-4802-8364-a59be7522b1c"
+  "package_uuid": "6aeda330-4a86-4f6c-9f37-5237ee9e17be"
  });
 })();
 
@@ -1309,7 +1309,7 @@ function updateGlobalBufferAndViews(buf) {
  Module["HEAPF64"] = HEAPF64 = new Float64Array(buf);
 }
 
-var STATIC_BASE = 1024, STACK_BASE = 31532112, STACKTOP = STACK_BASE, STACK_MAX = 26289232, DYNAMIC_BASE = 31532112, DYNAMICTOP_PTR = 26288304;
+var STATIC_BASE = 1024, STACK_BASE = 31532160, STACKTOP = STACK_BASE, STACK_MAX = 26289280, DYNAMIC_BASE = 31532160, DYNAMICTOP_PTR = 26288352;
 
 assert(STACK_BASE % 16 === 0, "stack must start aligned");
 
@@ -1986,7 +1986,7 @@ var ERRNO_CODES = {
  ESTRPIPE: 135
 };
 
-var __main_thread_futex_wait_address = 26289216;
+var __main_thread_futex_wait_address = 26289264;
 
 function _emscripten_futex_wake(addr, count) {
  if (addr <= 0 || addr > GROWABLE_HEAP_I8().length || addr & 3 != 0 || count < 0) return -28;
@@ -2058,12 +2058,12 @@ var PThread = {
   for (var i = 0; i < pthreadPoolSize; ++i) {
    PThread.allocateUnusedWorker();
   }
-  PThread.mainThreadBlock = 26288464;
+  PThread.mainThreadBlock = 26288512;
   for (var i = 0; i < 232 / 4; ++i) GROWABLE_HEAP_U32()[PThread.mainThreadBlock / 4 + i] = 0;
   GROWABLE_HEAP_I32()[PThread.mainThreadBlock + 12 >> 2] = PThread.mainThreadBlock;
   var headPtr = PThread.mainThreadBlock + 156;
   GROWABLE_HEAP_I32()[headPtr >> 2] = headPtr;
-  var tlsMemory = 26288704;
+  var tlsMemory = 26288752;
   for (var i = 0; i < 128; ++i) GROWABLE_HEAP_U32()[tlsMemory / 4 + i] = 0;
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 104 >> 2, tlsMemory);
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 40 >> 2, PThread.mainThreadBlock);
@@ -6203,7 +6203,7 @@ function _emscripten_get_pointerlock_status(pointerlockStatus) {
 }
 
 function _emscripten_get_sbrk_ptr() {
- return 26288304;
+ return 26288352;
 }
 
 function __webgl_enable_ANGLE_instanced_arrays(ctx) {
