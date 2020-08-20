@@ -22,6 +22,8 @@ typedef struct selector_t {
     Vector3 position_start;
     unsigned int state;
     unsigned int origin_piece;
+    Color color;
+    bool visible;
 } selector_t;
 
 typedef struct game_state_t 

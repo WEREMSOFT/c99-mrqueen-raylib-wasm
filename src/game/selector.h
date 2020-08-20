@@ -68,8 +68,6 @@ void selector_process_state_ready(game_state_t* game_state) {
             selector_pass_to_state_illegal(&game_state->selector);
         }
     }
-
-    DrawCubeWires(game_state->selector.position, 1, 1, 1, RED);
 }
 
 void selector_send_move_to_engine(game_state_t* game_state)
@@ -97,18 +95,16 @@ void selector_process_state_awaiting_target(game_state_t* game_state)
             selector_pass_to_state_illegal(&game_state->selector);
         }
     }
-
-    DrawCubeWires(game_state->selector.position, 1, 1, 1, RED);
-    DrawCubeWires(game_state->selector.position_start, 1, 1, 1, PURPLE);
 }
 
 void selector_pass_to_state_ready(selector_t* selector){
     selector->state = SELECTOR_STATE_READY;
+    selector->visible = true;
+    selector->color = RED;
 }
 
 
 void selector_process_state_illegal(selector_t* selector){
-    static bool blink = false;
     static float seconds = 0.0f;
     static int counter = 0;
     
@@ -116,13 +112,8 @@ void selector_process_state_illegal(selector_t* selector){
 
     if(seconds > 0.1f){
         seconds = 0;
-        blink = !blink;
+        selector->visible = !selector->visible;
         counter++;
-    }
-
-    /*Do something*/
-    if(blink){
-        DrawCube(selector->position, 1, 1, 1, RED);
     }
 
     if(counter > 10){
@@ -132,7 +123,7 @@ void selector_process_state_illegal(selector_t* selector){
 
 }
 
-void selector_draw(game_state_t* game_state)
+void selector_update(game_state_t* game_state)
 {
     switch(game_state->selector.state){
         case SELECTOR_STATE_READY:
@@ -147,5 +138,24 @@ void selector_draw(game_state_t* game_state)
             selector_process_state_illegal(&game_state->selector);
             break;
     }
+}
+
+void selector_draw(selector_t selector)
+{
+    switch(selector.state){
+        case SELECTOR_STATE_READY:
+            DrawCubeWires(selector.position, 1, 1, 1, selector.color);
+            break;
+        case SELECTOR_STATE_AWAITING_TARGET:
+            DrawCubeWires(selector.position, 1, 1, 1, RED);
+            DrawCubeWires(selector.position_start, 1, 1, 1, PURPLE);
+            break;
+        case SELECTOR_STATE_ILLEGAL:
+            if(selector.visible){
+                DrawCube(selector.position, 1, 1, 1, RED);
+            }
+            break;
+    }
+
 }
 #endif

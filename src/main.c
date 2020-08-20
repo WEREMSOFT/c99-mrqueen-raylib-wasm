@@ -35,7 +35,6 @@ Camera3D camera_perspective_init()
     return_value.type = CAMERA_PERSPECTIVE;
     return_value.up = (Vector3){0, 1.0f, 0};
     return_value.position = (Vector3){3.5f, 6.0f, 13.0f};
-    SetCameraMode(return_value, CAMERA_FREE);
     return return_value;
 }
 
@@ -44,11 +43,10 @@ Camera3D camera_top_init()
     Camera3D return_value = {0};
 
     return_value.fovy = 45.0f;
-    return_value.target = (Vector3){0, 0, 0};
-    return_value.type = CAMERA_PERSPECTIVE;
-    return_value.up = (Vector3){0, 0, 1.0f};
-    return_value.position = (Vector3){0, 10.0f, 0.0f};
-    SetCameraMode(return_value, CAMERA_FREE);
+    return_value.target = (Vector3){-20.f, 0.0f, 20.f};
+    return_value.type = CAMERA_ORTHOGRAPHIC;
+    return_value.up = (Vector3){0, 0, -1.0f};
+    return_value.position = (Vector3){-20.f, 20.0f, 20.0f};
     return return_value;
 }
 
@@ -92,15 +90,25 @@ void update_frame(void)
         }
     }
     
+    selector_update(&game_state);
+
     BeginDrawing();
     {
         ClearBackground(BLUE);
         {
             static unsigned int draw_console = false;
+            
             BeginMode3D(game_state.camera_perspective);
             {
                 game_board_draw(&game_state);
-                selector_draw(&game_state);
+                selector_draw(game_state.selector);
+            }
+            EndMode3D();
+
+            BeginMode3D(game_state.camera_top);
+            {
+                game_board_draw(&game_state);
+                selector_draw(game_state.selector);
             }
             EndMode3D();
 
@@ -125,8 +133,8 @@ int main(void)
     simple_printf("Browser dettected\n");
 #endif
 
-    game_state.selector.state = SELECTOR_STATE_READY;
-    
+    selector_pass_to_state_ready(&game_state.selector);
+
     game_board_reset(&game_state);
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
