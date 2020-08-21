@@ -207,58 +207,63 @@ Module.expectedDataFileDownloads++;
  };
  loadPackage({
   "files": [ {
-   "filename": "/assets/rook.obj",
+   "filename": "/assets/background_fight.png",
    "start": 0,
-   "end": 189022,
+   "end": 1606577,
+   "audio": 0
+  }, {
+   "filename": "/assets/rook.obj",
+   "start": 1606577,
+   "end": 1795599,
    "audio": 0
   }, {
    "filename": "/assets/king.obj",
-   "start": 189022,
-   "end": 979858,
+   "start": 1795599,
+   "end": 2586435,
    "audio": 0
   }, {
    "filename": "/assets/knight.obj",
-   "start": 979858,
-   "end": 1219511,
+   "start": 2586435,
+   "end": 2826088,
    "audio": 0
   }, {
    "filename": "/assets/pawn.obj",
-   "start": 1219511,
-   "end": 2428352,
+   "start": 2826088,
+   "end": 4034929,
    "audio": 0
   }, {
    "filename": "/assets/bishop.obj",
-   "start": 2428352,
-   "end": 3218150,
+   "start": 4034929,
+   "end": 4824727,
    "audio": 0
   }, {
    "filename": "/assets/queen.obj",
-   "start": 3218150,
-   "end": 4606197,
+   "start": 4824727,
+   "end": 6212774,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl100/base_lighting.vs",
-   "start": 4606197,
-   "end": 4607775,
+   "start": 6212774,
+   "end": 6214352,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl100/lighting.fs",
-   "start": 4607775,
-   "end": 4609827,
+   "start": 6214352,
+   "end": 6216404,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl330/base_lighting.vs",
-   "start": 4609827,
-   "end": 4610604,
+   "start": 6216404,
+   "end": 6217181,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl330/lighting.fs",
-   "start": 4610604,
-   "end": 4612646,
+   "start": 6217181,
+   "end": 6219223,
    "audio": 0
   } ],
-  "remote_package_size": 4612646,
-  "package_uuid": "017fb25d-cc29-42ad-90f4-b0c75ab3e96a"
+  "remote_package_size": 6219223,
+  "package_uuid": "18e8479d-b050-42dd-bc5b-833e779c1786"
  });
 })();
 
@@ -1309,7 +1314,7 @@ function updateGlobalBufferAndViews(buf) {
  Module["HEAPF64"] = HEAPF64 = new Float64Array(buf);
 }
 
-var STATIC_BASE = 1024, STACK_BASE = 31532160, STACKTOP = STACK_BASE, STACK_MAX = 26289280, DYNAMIC_BASE = 31532160, DYNAMICTOP_PTR = 26288352;
+var STATIC_BASE = 1024, STACK_BASE = 31532240, STACKTOP = STACK_BASE, STACK_MAX = 26289360, DYNAMIC_BASE = 31532240, DYNAMICTOP_PTR = 26288432;
 
 assert(STACK_BASE % 16 === 0, "stack must start aligned");
 
@@ -1803,10 +1808,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 209723: function() {
+ 209771: function() {
   throw "Canceled!";
  },
- 209971: function($0, $1) {
+ 210019: function($0, $1) {
   setTimeout(function() {
    _do_emscripten_dispatch_to_thread($0, $1);
   }, 0);
@@ -1986,7 +1991,7 @@ var ERRNO_CODES = {
  ESTRPIPE: 135
 };
 
-var __main_thread_futex_wait_address = 26289264;
+var __main_thread_futex_wait_address = 26289344;
 
 function _emscripten_futex_wake(addr, count) {
  if (addr <= 0 || addr > GROWABLE_HEAP_I8().length || addr & 3 != 0 || count < 0) return -28;
@@ -2058,12 +2063,12 @@ var PThread = {
   for (var i = 0; i < pthreadPoolSize; ++i) {
    PThread.allocateUnusedWorker();
   }
-  PThread.mainThreadBlock = 26288512;
+  PThread.mainThreadBlock = 26288592;
   for (var i = 0; i < 232 / 4; ++i) GROWABLE_HEAP_U32()[PThread.mainThreadBlock / 4 + i] = 0;
   GROWABLE_HEAP_I32()[PThread.mainThreadBlock + 12 >> 2] = PThread.mainThreadBlock;
   var headPtr = PThread.mainThreadBlock + 156;
   GROWABLE_HEAP_I32()[headPtr >> 2] = headPtr;
-  var tlsMemory = 26288752;
+  var tlsMemory = 26288832;
   for (var i = 0; i < 128; ++i) GROWABLE_HEAP_U32()[tlsMemory / 4 + i] = 0;
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 104 >> 2, tlsMemory);
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 40 >> 2, PThread.mainThreadBlock);
@@ -6203,7 +6208,7 @@ function _emscripten_get_pointerlock_status(pointerlockStatus) {
 }
 
 function _emscripten_get_sbrk_ptr() {
- return 26288352;
+ return 26288432;
 }
 
 function __webgl_enable_ANGLE_instanced_arrays(ctx) {

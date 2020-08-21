@@ -17,6 +17,11 @@ const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B
                             };
 
 
+enum game_state_enum {
+    GAME_STATE_PLAYING,
+    GAME_STATE_WON
+};
+
 typedef struct selector_t {
     Vector3 position;
     Vector3 position_start;
@@ -28,6 +33,7 @@ typedef struct selector_t {
 
 typedef struct game_state_t 
 {
+    int state;
     unsigned int board[8][8];
     char textBoxText[1000];
     Camera3D camera_perspective;

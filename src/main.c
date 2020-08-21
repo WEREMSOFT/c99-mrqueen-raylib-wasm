@@ -25,6 +25,7 @@
 #define HEIGHT 800
 
 game_state_t game_state = {0};
+Texture2D background = {0};
 
 Camera3D camera_perspective_init()
 {
@@ -60,27 +61,45 @@ void update_frame(void)
     {
         switch(event.type){
             case EVENT_RESPONSE:
+            {
                 printf("position sent %s", event.data);
+
+                unsigned int piece = game_board_get_piece_at_target(game_state.board, event.data);
+
+                if(piece == KNG_W){
+                    game_state.state = GAME_STATE_WON;
+                }
+
                 game_board_move_piece(game_state.board, event.data);
                 command_history_add_command(" ");
                 command_history_add_command(event.data);
                 selector_pass_to_state_ready(&game_state.selector);
+            }
             break;
             case EVENT_COMMAND:
-                game_board_move_piece(game_state.board, event.data);
-                char command_as_string[300] = {0};
+                {
 
-                snprintf(command_as_string, 
-                    300, 
-                    "position startpos moves%s %s",
-                    command_history_get_buffer(),
-                    event.data);
+                    unsigned int piece = game_board_get_piece_at_target(game_state.board, event.data);
+                    game_board_move_piece(game_state.board, event.data);
 
-                parse_line(command_as_string);
-                parse_line(commands[GO]);
-                
-                command_history_add_command(" ");
-                command_history_add_command(event.data);
+                    if(piece == KNG_B){
+                        game_state.state = GAME_STATE_WON;
+                        break;
+                    }
+                    char command_as_string[300] = {0};
+
+                    snprintf(command_as_string, 
+                        300, 
+                        "position startpos moves%s %s",
+                        command_history_get_buffer(),
+                        event.data);
+
+                    parse_line(command_as_string);
+                    parse_line(commands[GO]);
+                    
+                    command_history_add_command(" ");
+                    command_history_add_command(event.data);
+                }
                 break;
             case EVENT_LOG:
                 printf("info: %s", event.data);
@@ -89,32 +108,38 @@ void update_frame(void)
                 printf("Unknow event: %s\n", event.data);
         }
     }
-    
-    selector_update(&game_state);
+    switch (game_state.state){
+        case GAME_STATE_PLAYING:
+            selector_update(&game_state);
+            break;
+    }
 
     BeginDrawing();
     {
-        ClearBackground(BLUE);
+        static unsigned int draw_console = false;
+        ClearBackground(LIGHTGRAY);
+        DrawTexture(background, 0, 0, WHITE);
+        
+        BeginMode3D(game_state.camera_perspective);
         {
-            static unsigned int draw_console = false;
-            
-            BeginMode3D(game_state.camera_perspective);
-            {
-                game_board_draw(&game_state);
-                selector_draw(game_state.selector);
-            }
-            EndMode3D();
-
-            BeginMode3D(game_state.camera_top);
-            {
-                game_board_draw(&game_state);
-                selector_draw(game_state.selector);
-            }
-            EndMode3D();
-
-            gui_draw(&game_state);           
+            game_board_draw(&game_state);
+            selector_draw(game_state.selector);
         }
-        DrawFPS(700, 10);
+        EndMode3D();
+
+        BeginMode3D(game_state.camera_top);
+        {
+            game_board_draw(&game_state);
+            selector_draw(game_state.selector);
+        }
+        EndMode3D();
+
+        gui_draw(&game_state);           
+        DrawFPS(900, 19);
+        if(game_state.state == GAME_STATE_WON){
+            DrawText("CHECK MATE!", 155, HEIGHT/2 + 5, 100, BLACK);
+            DrawText("CHECK MATE!", 150, HEIGHT/2, 100, RED);
+        }
     }
     EndDrawing();
 }
@@ -139,6 +164,9 @@ int main(void)
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
+
+    background = LoadTexture("assets/background_fight.png");
+
     game_state.camera_top = camera_top_init();
     game_state.camera_perspective = camera_perspective_init();
     
@@ -162,6 +190,7 @@ int main(void)
 #endif
     gui_fini();
     command_history_fini();
+    UnloadTexture(background);
     CloseWindow();
     return 0;
 }

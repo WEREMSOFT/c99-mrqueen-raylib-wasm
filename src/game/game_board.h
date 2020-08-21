@@ -46,6 +46,13 @@ bool game_board_is_target_position_legal(unsigned int board[8][8], selector_t se
     return true;
 }
 
+unsigned int game_board_get_piece_at_target(unsigned int board[8][8], char *coords){
+    unsigned int board_index_target_x = (unsigned int)(strchr(board_coord_x, coords[2]) - board_coord_x);
+    unsigned int board_index_target_y = (unsigned int)(strchr(board_coord_y, coords[3]) - board_coord_y);
+    
+    return board[board_index_target_y][board_index_target_x];
+}
+
 void game_board_move_piece(unsigned int board[8][8], char *coords)
 {
    unsigned int board_index_cource_x = (unsigned int)(strchr(board_coord_x, coords[0]) - board_coord_x);
@@ -151,7 +158,7 @@ void game_board_draw(game_state_t *game_state)
         {
             Vector3 pos = (Vector3){i + offsetX, -0.5f, j + offsetZ};
             game_board_pieces_draw(game_state->board[j][i], pos);
-            DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : WHITE);
+            DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : LIGHTGRAY);
         }
     }
 }
