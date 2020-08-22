@@ -19,7 +19,9 @@ const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B
 
 enum game_state_enum {
     GAME_STATE_PLAYING,
-    GAME_STATE_WON
+    GAME_STATE_ANIMATING,
+    GAME_STATE_WON_WHITE,
+    GAME_STATE_WON_BLACK,
 };
 
 typedef struct selector_t {
@@ -43,6 +45,7 @@ typedef struct game_state_t
     Light light3;
     Shader shader;
     selector_t selector;
+    Texture2D background;
 } game_state_t;
 
 char commands[COMMAND_COUNT][50] = {

@@ -25,7 +25,6 @@
 #define HEIGHT 800
 
 game_state_t game_state = {0};
-Texture2D background = {0};
 
 Camera3D camera_perspective_init()
 {
@@ -67,7 +66,7 @@ void update_frame(void)
                 unsigned int piece = game_board_get_piece_at_target(game_state.board, event.data);
 
                 if(piece == KNG_W){
-                    game_state.state = GAME_STATE_WON;
+                    game_state.state = GAME_STATE_WON_BLACK;
                 }
 
                 game_board_move_piece(game_state.board, event.data);
@@ -83,7 +82,7 @@ void update_frame(void)
                     game_board_move_piece(game_state.board, event.data);
 
                     if(piece == KNG_B){
-                        game_state.state = GAME_STATE_WON;
+                        game_state.state = GAME_STATE_WON_WHITE;
                         break;
                     }
                     char command_as_string[300] = {0};
@@ -116,9 +115,8 @@ void update_frame(void)
 
     BeginDrawing();
     {
-        static unsigned int draw_console = false;
         ClearBackground(LIGHTGRAY);
-        DrawTexture(background, 0, 0, WHITE);
+        DrawTexture(game_state.background, 0, 0, WHITE);
         
         BeginMode3D(game_state.camera_perspective);
         {
@@ -136,9 +134,17 @@ void update_frame(void)
 
         gui_draw(&game_state);           
         DrawFPS(900, 19);
-        if(game_state.state == GAME_STATE_WON){
+        if(game_state.state >= GAME_STATE_WON_WHITE){
             DrawText("CHECK MATE!", 155, HEIGHT/2 + 5, 100, BLACK);
             DrawText("CHECK MATE!", 150, HEIGHT/2, 100, RED);
+            if(game_state.state == GAME_STATE_WON_BLACK)
+            {
+                DrawText("BLACK WINS", 255, HEIGHT/2 + 105, 70, WHITE);
+                DrawText("BLACK WINS", 250, HEIGHT/2 + 100, 70, BLACK);
+            } else {
+                DrawText("WHITE WINS", 255, HEIGHT/2 + 105, 70, BLACK);
+                DrawText("WHITE WINS", 250, HEIGHT/2 + 100, 70, WHITE);
+            }
         }
     }
     EndDrawing();
@@ -165,7 +171,7 @@ int main(void)
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
 
-    background = LoadTexture("assets/background_fight.png");
+    game_state.background = LoadTexture("assets/background_fight.png");
 
     game_state.camera_top = camera_top_init();
     game_state.camera_perspective = camera_perspective_init();
@@ -190,7 +196,7 @@ int main(void)
 #endif
     gui_fini();
     command_history_fini();
-    UnloadTexture(background);
+    UnloadTexture(game_state.background);
     CloseWindow();
     return 0;
 }
