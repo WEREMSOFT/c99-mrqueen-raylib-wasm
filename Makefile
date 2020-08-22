@@ -94,7 +94,7 @@ $(BLD_D)%.$(BIN_EXTENSION): $(SRC_FILES)
 	@echo ""
 
 $(HTML_D)%.html: $(SRC_FILES)
-	$(EMSC_CC_COMMAND) -g4 --source-map-base http://127.0.0.1:5500/html/ $^ -o $@ $(EMSC_STATIC_LIBS_D)
+	$(EMSC_CC_COMMAND) -g4 --source-map-base https://weremsoft.github.io/c99-streaming-wasm/ $^ -o $@ $(EMSC_STATIC_LIBS_D)
 
 print_information:
 	@echo "Dettected OS: $(DETTECTED_OS)"
