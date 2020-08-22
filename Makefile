@@ -74,6 +74,7 @@ main: $(SRC_FILES)
 	@make copy_assets
 
 web: $(HTML_D)main.html
+	mv $(HTML_D)/main.html $(HTML_D)/index.html
 
 $(OBJ_D)%.o: $(SRC_D)%.c
 	$(CC_COMMAND) -c -o $@ $^

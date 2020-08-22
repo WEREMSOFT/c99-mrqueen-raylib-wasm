@@ -50,11 +50,7 @@ Camera3D camera_top_init()
     return return_value;
 }
 
-void update_frame(void)
-{
-    UpdateCamera(&game_state.camera_perspective);
-    ui_pre_frame_update();
-
+void event_process(){
     event_t event = {0};
     while((event = event_dequeue()).type)
     {
@@ -107,47 +103,73 @@ void update_frame(void)
                 printf("Unknow event: %s\n", event.data);
         }
     }
+}
+
+void draw_frame_pre() {
+    BeginDrawing();
+    
+    ClearBackground(LIGHTGRAY);
+    DrawTexture(game_state.background, 0, 0, WHITE);
+    
+    BeginMode3D(game_state.camera_perspective);
+    {
+        game_board_draw(&game_state);
+        selector_draw(game_state.selector);
+    }
+    EndMode3D();
+
+    BeginMode3D(game_state.camera_top);
+    {
+        game_board_draw(&game_state);
+        selector_draw(game_state.selector);
+    }
+    EndMode3D();
+
+}
+
+void draw_frame_post() {
+    gui_draw(&game_state);           
+    DrawFPS(900, 19);
+    EndDrawing();
+}
+
+void update_frame(void)
+{
+    UpdateCamera(&game_state.camera_perspective);
+    ui_pre_frame_update();
+
+    event_process();
+    
     switch (game_state.state){
         case GAME_STATE_PLAYING:
             selector_update(&game_state);
+            draw_frame_pre();
+            draw_frame_post();
+            break;
+        case GAME_STATE_WON_WHITE:
+            draw_frame_pre();
+
+            DrawText("CHECK MATE!", 155, HEIGHT/2 + 5, 100, BLACK);
+            DrawText("CHECK MATE!", 150, HEIGHT/2, 100, RED);
+
+            DrawText("WHITE WINS", 255, HEIGHT/2 + 105, 70, BLACK);
+            DrawText("WHITE WINS", 250, HEIGHT/2 + 100, 70, WHITE);
+
+            draw_frame_post();
+            break;
+        case GAME_STATE_WON_BLACK:
+            draw_frame_pre();
+
+            DrawText("CHECK MATE!", 155, HEIGHT/2 + 5, 100, BLACK);
+            DrawText("CHECK MATE!", 150, HEIGHT/2, 100, RED);
+            
+            DrawText("BLACK WINS", 255, HEIGHT/2 + 105, 70, WHITE);
+            DrawText("BLACK WINS", 250, HEIGHT/2 + 100, 70, BLACK);
+
+            draw_frame_post();
             break;
     }
 
-    BeginDrawing();
-    {
-        ClearBackground(LIGHTGRAY);
-        DrawTexture(game_state.background, 0, 0, WHITE);
-        
-        BeginMode3D(game_state.camera_perspective);
-        {
-            game_board_draw(&game_state);
-            selector_draw(game_state.selector);
-        }
-        EndMode3D();
-
-        BeginMode3D(game_state.camera_top);
-        {
-            game_board_draw(&game_state);
-            selector_draw(game_state.selector);
-        }
-        EndMode3D();
-
-        gui_draw(&game_state);           
-        DrawFPS(900, 19);
-        if(game_state.state >= GAME_STATE_WON_WHITE){
-            DrawText("CHECK MATE!", 155, HEIGHT/2 + 5, 100, BLACK);
-            DrawText("CHECK MATE!", 150, HEIGHT/2, 100, RED);
-            if(game_state.state == GAME_STATE_WON_BLACK)
-            {
-                DrawText("BLACK WINS", 255, HEIGHT/2 + 105, 70, WHITE);
-                DrawText("BLACK WINS", 250, HEIGHT/2 + 100, 70, BLACK);
-            } else {
-                DrawText("WHITE WINS", 255, HEIGHT/2 + 105, 70, BLACK);
-                DrawText("WHITE WINS", 250, HEIGHT/2 + 100, 70, WHITE);
-            }
-        }
-    }
-    EndDrawing();
 }
 
 int main(void)
