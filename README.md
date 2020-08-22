@@ -4,4 +4,4 @@ Yes, just that, I made it for fun.
 
 Check the [online version](https://weremsoft.github.io/c99-streaming-wasm/)
 
-(./readme-images/screenshot.png "screenshot")
+[screenshot](https://raw.githubusercontent.com/WEREMSOFT/c99-streaming-wasm/master/readme-images/screenshot.png)
