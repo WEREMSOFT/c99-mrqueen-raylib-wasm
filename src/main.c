@@ -105,7 +105,7 @@ void event_process(){
     }
 }
 
-void draw_frame_pre() {
+void draw_pre() {
     BeginDrawing();
     
     ClearBackground(LIGHTGRAY);
@@ -127,13 +127,13 @@ void draw_frame_pre() {
 
 }
 
-void draw_frame_post() {
+void draw_post() {
     gui_draw(&game_state);           
     DrawFPS(900, 19);
     EndDrawing();
 }
 
-void update_frame(void)
+void update(void)
 {
     UpdateCamera(&game_state.camera_perspective);
     ui_pre_frame_update();
@@ -143,30 +143,30 @@ void update_frame(void)
     switch (game_state.state){
         case GAME_STATE_PLAYING:
             selector_update(&game_state);
-            draw_frame_pre();
-            draw_frame_post();
+            draw_pre();
+            draw_post();
             break;
         case GAME_STATE_WON_WHITE:
-            draw_frame_pre();
+            draw_pre();
 
-            DrawText("CHECK MATE!", 155, HEIGHT/2 + 5, 100, BLACK);
-            DrawText("CHECK MATE!", 150, HEIGHT/2, 100, RED);
+            DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
+            DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
 
-            DrawText("WHITE WINS", 255, HEIGHT/2 + 105, 70, BLACK);
-            DrawText("WHITE WINS", 250, HEIGHT/2 + 100, 70, WHITE);
+            DrawText("WHITE WINS", 255, HEIGHT/3 + 105, 70, BLACK);
+            DrawText("WHITE WINS", 250, HEIGHT/3 + 100, 70, WHITE);
 
-            draw_frame_post();
+            draw_post();
             break;
         case GAME_STATE_WON_BLACK:
-            draw_frame_pre();
+            draw_pre();
 
-            DrawText("CHECK MATE!", 155, HEIGHT/2 + 5, 100, BLACK);
-            DrawText("CHECK MATE!", 150, HEIGHT/2, 100, RED);
+            DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
+            DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
             
-            DrawText("BLACK WINS", 255, HEIGHT/2 + 105, 70, WHITE);
-            DrawText("BLACK WINS", 250, HEIGHT/2 + 100, 70, BLACK);
+            DrawText("BLACK WINS", 255, HEIGHT/3 + 105, 70, WHITE);
+            DrawText("BLACK WINS", 250, HEIGHT/3 + 100, 70, BLACK);
 
-            draw_frame_post();
+            draw_post();
             break;
     }
 
@@ -209,11 +209,11 @@ int main(void)
     uci_board_reset();
 
 #ifdef OS_WEB
-    emscripten_set_main_loop(update_frame, 0, 1);
+    emscripten_set_main_loop(update, 0, 1);
 #else
     while (!WindowShouldClose())
     {
-        update_frame();
+        update();
     }
 #endif
     gui_fini();
