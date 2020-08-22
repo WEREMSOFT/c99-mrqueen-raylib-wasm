@@ -75,6 +75,7 @@ main: $(SRC_FILES)
 
 web: $(HTML_D)main.html
 	mv $(HTML_D)/main.html $(HTML_D)/index.html
+	cp -r src $(HTML_D)
 
 $(OBJ_D)%.o: $(SRC_D)%.c
 	$(CC_COMMAND) -c -o $@ $^
