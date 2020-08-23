@@ -16,6 +16,7 @@ enum enum_pieces
     KGT_W,
     KNG_W,
     QEN_W,
+    PIECE_IN_MOTION,
     PIECES_COUNT
 };
 
@@ -24,6 +25,7 @@ enum enum_commands {
     UCINEWGAME,
     ISREADY,
     GO,
+    STOP,
     COMMAND_COUNT
 };
 #endif

@@ -52,12 +52,15 @@ void gui_draw(game_state_t* game_state){
         if (igBeginMenu("File", true))
         {
             if(igMenuItemBool("New Game", "CTRL+N", false, true)){
-                parse_line(commands[UCI]);
-                parse_line(commands[UCINEWGAME]);
-                parse_line((char *)&commands[ISREADY]);
-                game_board_reset(game_state);
-                char *history_buffer = command_history_get_buffer();
-                memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
+                event_t event = {0};
+                event.type = EVENT_UI_NEW_GAME;
+                event_queue(event);
+                // parse_line(commands[UCI]);
+                // parse_line(commands[UCINEWGAME]);
+                // parse_line((char *)&commands[ISREADY]);
+                // game_board_reset(game_state);
+                // char *history_buffer = command_history_get_buffer();
+                // memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
             };
             if(igMenuItemBool("Quit", "CTRL+X", false, true)){
                 CloseWindow();

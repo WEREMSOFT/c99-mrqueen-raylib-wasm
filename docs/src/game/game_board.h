@@ -30,7 +30,7 @@ bool game_board_is_target_position_legal(unsigned int board[8][8], selector_t se
         return false;
 
     unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
-    if(piece > 6)
+    if(piece > 7)
         return false;
 
     switch (selector.origin_piece)
@@ -46,22 +46,75 @@ bool game_board_is_target_position_legal(unsigned int board[8][8], selector_t se
     return true;
 }
 
+typedef struct board_matrix_coordinates_t {
+    unsigned int source_x;
+    unsigned int source_y;
+    unsigned int target_x;
+    unsigned int target_y;
+
+} board_matrix_coordinates_t;
+
+board_matrix_coordinates_t game_board_get_coordinates_in_matrix(char *coords){
+    board_matrix_coordinates_t return_value = {0};
+
+    return_value.source_x = (unsigned int)(strchr(board_coord_x, coords[0]) - board_coord_x);
+    return_value.source_y = (unsigned int)(strchr(board_coord_y, coords[1]) - board_coord_y);
+    return_value.target_x = (unsigned int)(strchr(board_coord_x, coords[2]) - board_coord_x);
+    return_value.target_y = (unsigned int)(strchr(board_coord_y, coords[3]) - board_coord_y);
+
+    return return_value;
+}
+
+Vector3 game_board_get_target_coordinates_in_world(char *coords){
+    board_matrix_coordinates_t coords_m = {0};
+
+    coords_m = game_board_get_coordinates_in_matrix(coords);
+
+    Vector3 return_value = (Vector3){coords_m.target_x , -0.5f, coords_m.target_y };
+
+    return return_value;
+}
+
+Vector3 game_board_get_source_coordinates_in_world(char *coords){
+    board_matrix_coordinates_t coords_m = {0};
+
+    coords_m = game_board_get_coordinates_in_matrix(coords);
+
+    Vector3 return_value = (Vector3){coords_m.source_x , -0.5f, coords_m.source_y };
+
+    return return_value;
+}
+
 unsigned int game_board_get_piece_at_target(unsigned int board[8][8], char *coords){
-    unsigned int board_index_target_x = (unsigned int)(strchr(board_coord_x, coords[2]) - board_coord_x);
-    unsigned int board_index_target_y = (unsigned int)(strchr(board_coord_y, coords[3]) - board_coord_y);
+    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
     
-    return board[board_index_target_y][board_index_target_x];
+    return board[coords_m.target_y][coords_m.target_x];
+}
+
+unsigned int game_board_get_piece_at_source(unsigned int board[8][8], char *coords){
+    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+    
+    return board[coords_m.source_y][coords_m.source_x];
+}
+
+void game_board_set_piece_at_source(unsigned int board[8][8], char *coords, unsigned int piece){
+    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+
+    board[coords_m.source_y][coords_m.source_x] = piece;
+}
+
+void game_board_set_piece_at_target(unsigned int board[8][8], char *coords, unsigned int piece){
+    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+
+    board[coords_m.target_y][coords_m.target_x] = piece;
 }
 
 void game_board_move_piece(unsigned int board[8][8], char *coords)
 {
-   unsigned int board_index_cource_x = (unsigned int)(strchr(board_coord_x, coords[0]) - board_coord_x);
-   unsigned int board_index_cource_y = (unsigned int)(strchr(board_coord_y, coords[1]) - board_coord_y);
-   unsigned int board_index_target_x = (unsigned int)(strchr(board_coord_x, coords[2]) - board_coord_x);
-   unsigned int board_index_target_y = (unsigned int)(strchr(board_coord_y, coords[3]) - board_coord_y);
-
-   board[board_index_target_y][board_index_target_x] = board[board_index_cource_y][board_index_cource_x];
-   board[board_index_cource_y][board_index_cource_x] = EMPTY;
+    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+    
+    board[coords_m.target_y][coords_m.target_x] = board[coords_m.source_y][coords_m.source_x];
+    board[coords_m.source_y][coords_m.source_x] = EMPTY;
 }
 
 void game_board_reset(game_state_t* game_state){
@@ -123,6 +176,9 @@ void game_board_pieces_draw(int piece, Vector3 position)
             models[MODEL_QUEEN].transform = rotation_matrix;
             DrawModel(models[MODEL_QUEEN], position, 0.015f, WHITE);
             break;
+        case PIECE_IN_MOTION:
+            // we never draw this.
+            break;
         default:
             break;
     }
@@ -150,13 +206,11 @@ void game_board_models_load(game_state_t* game_state){
 
 void game_board_draw(game_state_t *game_state)
 {
-    float offsetX = 0.0f;
-    float offsetZ = 0.0f;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            Vector3 pos = (Vector3){i + offsetX, -0.5f, j + offsetZ};
+            Vector3 pos = (Vector3){i , -0.5f, j };
             game_board_pieces_draw(game_state->board[j][i], pos);
             DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : LIGHTGRAY);
         }

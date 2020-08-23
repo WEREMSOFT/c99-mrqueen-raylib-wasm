@@ -10,6 +10,7 @@ enum event_type_e {
     EVENT_EMPTY,
     EVENT_COMMAND,
     EVENT_RESPONSE,
+    EVENT_UI_NEW_GAME,
     EVENT_LOG,
     EVENT_COUNT
 };

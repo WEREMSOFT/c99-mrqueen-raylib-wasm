@@ -50,37 +50,55 @@ Camera3D camera_top_init()
     return return_value;
 }
 
+void game_state_pass_to_state_animating(char* position){
+    game_state.state = GAME_STATE_ANIMATING;
+    game_state.piece_to_move_lerp_percentage = 0;
+    game_state.piece_to_move = game_board_get_piece_at_source(game_state.board, position);
+    game_state.piece_to_move_position_actual = game_board_get_source_coordinates_in_world(position);
+    game_state.piece_to_move_position_target = game_board_get_target_coordinates_in_world(position);
+    game_board_set_piece_at_source(game_state.board, position, PIECE_IN_MOTION);
+    strncpy(game_state.target_position, position, 5);
+}
+
 void event_process(){
     event_t event = {0};
     while((event = event_dequeue()).type)
     {
         switch(event.type){
+            case EVENT_UI_NEW_GAME:
+                parse_line(commands[STOP]);
+                parse_line(commands[UCI]);
+                parse_line(commands[UCINEWGAME]);
+                parse_line((char *)&commands[ISREADY]);
+                game_board_reset(&game_state);
+                char *history_buffer = command_history_get_buffer();
+                memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
+                game_state.state = GAME_STATE_PLAYING;
+                selector_pass_to_state_ready(&game_state.selector);
+                queue_init();
+                break;
             case EVENT_RESPONSE:
             {
                 printf("position sent %s", event.data);
 
                 unsigned int piece = game_board_get_piece_at_target(game_state.board, event.data);
 
-                if(piece == KNG_W){
-                    game_state.state = GAME_STATE_WON_BLACK;
+                if(game_state.state == GAME_STATE_ANIMATING || game_state.state == GAME_STATE_PLAYING){
+                    game_state_pass_to_state_animating(event.data);
+                    command_history_add_command(" ");
+                    command_history_add_command(event.data);
+                    selector_pass_to_state_ready(&game_state.selector);
                 }
 
-                game_board_move_piece(game_state.board, event.data);
-                command_history_add_command(" ");
-                command_history_add_command(event.data);
-                selector_pass_to_state_ready(&game_state.selector);
             }
             break;
             case EVENT_COMMAND:
                 {
 
                     unsigned int piece = game_board_get_piece_at_target(game_state.board, event.data);
-                    game_board_move_piece(game_state.board, event.data);
 
-                    if(piece == KNG_B){
-                        game_state.state = GAME_STATE_WON_WHITE;
-                        break;
-                    }
+                    game_state_pass_to_state_animating(event.data);
+
                     char command_as_string[300] = {0};
 
                     snprintf(command_as_string, 
@@ -106,8 +124,11 @@ void event_process(){
 }
 
 void draw_pre() {
+    ui_pre_frame_update();
+}
+
+void draw() {
     BeginDrawing();
-    
     ClearBackground(LIGHTGRAY);
     DrawTexture(game_state.background, 0, 0, WHITE);
     
@@ -124,7 +145,6 @@ void draw_pre() {
         selector_draw(game_state.selector);
     }
     EndMode3D();
-
 }
 
 void draw_post() {
@@ -135,19 +155,18 @@ void draw_post() {
 
 void update(void)
 {
-    UpdateCamera(&game_state.camera_perspective);
-    ui_pre_frame_update();
-
     event_process();
     
     switch (game_state.state){
         case GAME_STATE_PLAYING:
             selector_update(&game_state);
             draw_pre();
+            draw();
             draw_post();
             break;
         case GAME_STATE_WON_WHITE:
             draw_pre();
+            draw();
 
             DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
             DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
@@ -159,6 +178,7 @@ void update(void)
             break;
         case GAME_STATE_WON_BLACK:
             draw_pre();
+            draw();
 
             DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
             DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
@@ -166,6 +186,47 @@ void update(void)
             DrawText("BLACK WINS", 255, HEIGHT/3 + 105, 70, WHITE);
             DrawText("BLACK WINS", 250, HEIGHT/3 + 100, 70, BLACK);
 
+            draw_post();
+            break;
+        case GAME_STATE_ANIMATING:
+            game_state.piece_to_move_lerp_percentage += 0.01;
+            game_state.piece_to_move_position_actual = Vector3Lerp(game_state.piece_to_move_position_actual, game_state.piece_to_move_position_target, game_state.piece_to_move_lerp_percentage);
+            if(Vector3Distance(game_state.piece_to_move_position_actual, game_state.piece_to_move_position_target) < 0.1){
+                    unsigned int piece = game_board_get_piece_at_target(game_state.board, game_state.target_position);
+                    
+                    game_state.piece_to_move_position_actual = game_state.piece_to_move_position_target;
+                    game_board_set_piece_at_target(game_state.board, game_state.target_position, game_state.piece_to_move);
+                    game_board_set_piece_at_source(game_state.board, game_state.target_position, EMPTY);
+                    game_state.state = GAME_STATE_PLAYING;
+
+
+                    if(piece == KNG_B){
+                        game_state.state = GAME_STATE_WON_WHITE;
+                    }
+                    if(piece == KNG_W){
+                        game_state.state = GAME_STATE_WON_BLACK;
+                    }
+            }
+            draw_pre();
+
+            ClearBackground(LIGHTGRAY);
+            DrawTexture(game_state.background, 0, 0, WHITE);
+            
+            BeginMode3D(game_state.camera_perspective);
+            {
+                game_board_draw(&game_state);
+                game_board_pieces_draw(game_state.piece_to_move, game_state.piece_to_move_position_actual);
+                selector_draw(game_state.selector);
+            }
+            EndMode3D();
+
+            BeginMode3D(game_state.camera_top);
+            {
+                game_board_draw(&game_state);
+                game_board_pieces_draw(game_state.piece_to_move, game_state.piece_to_move_position_actual);
+                selector_draw(game_state.selector);
+            }
+            EndMode3D();
             draw_post();
             break;
     }

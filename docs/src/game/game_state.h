@@ -16,7 +16,6 @@ const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B
                             {TWR_W, KGT_W, BSP_W, QEN_W, KNG_W, BSP_W, KGT_W, TWR_W},
                             };
 
-
 enum game_state_enum {
     GAME_STATE_PLAYING,
     GAME_STATE_ANIMATING,
@@ -46,13 +45,19 @@ typedef struct game_state_t
     Shader shader;
     selector_t selector;
     Texture2D background;
+    char target_position[5];
+    Vector3 piece_to_move_position_actual;
+    Vector3 piece_to_move_position_target;
+    float piece_to_move_lerp_percentage;
+    unsigned int piece_to_move;
 } game_state_t;
 
 char commands[COMMAND_COUNT][50] = {
     "uci",
     "ucinewgame",
     "isready",
-    "go"
+    "go",
+    "stop"
 };
 
 #endif
