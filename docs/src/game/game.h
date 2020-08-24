@@ -212,7 +212,7 @@ void game_update(game_context_t* game_state)
             DrawText("WHITE WINS", 255, HEIGHT/3 + 105, 70, BLACK);
             DrawText("WHITE WINS", 250, HEIGHT/3 + 100, 70, WHITE);
 
-            game_draw_post(game_state);
+            game_draw_post();
             break;
         case GAME_STATE_WON_BLACK:
             game_draw_pre();
@@ -336,7 +336,7 @@ void game_update(game_context_t* game_state)
                 game_board_pieces_draw(game_state->piece_to_move, game_state->piece_to_move_position_actual);
             }
             EndMode3D();
-            game_draw_post(game_state);
+            game_draw_post();
             break;
     }
 

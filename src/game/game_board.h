@@ -57,7 +57,7 @@ typedef struct game_board_matrix_coordinates_t {
 } game_board_matrix_coordinates_t;
 
 void game_board_reset(unsigned int board[8][8]){
-    memcpy(board, base_board, sizeof(board) * sizeof(board[0]));
+    memcpy(board, base_board, sizeof(board) * 64);
 }
 
 game_board_matrix_coordinates_t game_board_get_coordinates_in_matrix(char *coords){
