@@ -5,7 +5,7 @@
 #include <imconfig.h>
 #include <cimgui.h>
 #include "cimgui_impl_raylib.h"
-#include "game_state.h"
+#include "game.h"
 #include "game_board.h"
 
 ImDrawData *draw_data;
@@ -14,7 +14,6 @@ Texture2D texture = {0};
 
 void gui_init(int screen_width, int screen_height){
 
-    struct ImGuiContext *ctx;
     struct ImGuiIO *io;
     unsigned char *pixels = NULL;
 
@@ -46,7 +45,7 @@ void gui_fini(){
     UnloadTexture(texture);
 }
 
-void gui_draw(game_state_t* game_state){
+void gui_draw(){
     if (igBeginMainMenuBar())
     {
         if (igBeginMenu("File", true))
@@ -54,13 +53,7 @@ void gui_draw(game_state_t* game_state){
             if(igMenuItemBool("New Game", "CTRL+N", false, true)){
                 event_t event = {0};
                 event.type = EVENT_UI_NEW_GAME;
-                event_queue(event);
-                // parse_line(commands[UCI]);
-                // parse_line(commands[UCINEWGAME]);
-                // parse_line((char *)&commands[ISREADY]);
-                // game_board_reset(game_state);
-                // char *history_buffer = command_history_get_buffer();
-                // memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
+                event_queue_enqueue(event);
             };
             if(igMenuItemBool("Quit", "CTRL+X", false, true)){
                 CloseWindow();

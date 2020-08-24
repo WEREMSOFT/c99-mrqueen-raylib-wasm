@@ -32,7 +32,7 @@ OBJ_FILES := $(patsubst $(SRC_D)%.c,$(OBJ_D)%.o,$(SRC_FILES))
 
 INCLUDE_D := -I$(LIBS_D)include/
 STATIC_LIBS_D := -L$(LIBS_D)static/
-CFLAGS := -O0 -Wpedantic -g -w -std=c99 -g3 -DOS_$(DETTECTED_OS) 
+CFLAGS := -O0 -Wpedantic -g -Wall -std=c99 -g3 -DOS_$(DETTECTED_OS) 
 DEBUGGER := kdbg # Other options: cgdb gdb
 MK_DIR:= mkdir -p
 BIN_EXTENSION = bin

@@ -263,7 +263,7 @@ Module.expectedDataFileDownloads++;
    "audio": 0
   } ],
   "remote_package_size": 6219223,
-  "package_uuid": "dbc70ce6-60ee-4093-9b3d-d13821b7bdf5"
+  "package_uuid": "350f2be6-f317-4e55-8971-1a49b0c312c0"
  });
 })();
 
@@ -1314,7 +1314,7 @@ function updateGlobalBufferAndViews(buf) {
  Module["HEAPF64"] = HEAPF64 = new Float64Array(buf);
 }
 
-var STATIC_BASE = 1024, STACK_BASE = 31532256, STACKTOP = STACK_BASE, STACK_MAX = 26289376, DYNAMIC_BASE = 31532256, DYNAMICTOP_PTR = 26288448;
+var STATIC_BASE = 1024, STACK_BASE = 31530672, STACKTOP = STACK_BASE, STACK_MAX = 26287792, DYNAMIC_BASE = 31530672, DYNAMICTOP_PTR = 26286864;
 
 assert(STACK_BASE % 16 === 0, "stack must start aligned");
 
@@ -1808,10 +1808,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 209787: function() {
+ 209803: function() {
   throw "Canceled!";
  },
- 210035: function($0, $1) {
+ 210051: function($0, $1) {
   setTimeout(function() {
    _do_emscripten_dispatch_to_thread($0, $1);
   }, 0);
@@ -1991,7 +1991,7 @@ var ERRNO_CODES = {
  ESTRPIPE: 135
 };
 
-var __main_thread_futex_wait_address = 26289360;
+var __main_thread_futex_wait_address = 26287776;
 
 function _emscripten_futex_wake(addr, count) {
  if (addr <= 0 || addr > GROWABLE_HEAP_I8().length || addr & 3 != 0 || count < 0) return -28;
@@ -2063,12 +2063,12 @@ var PThread = {
   for (var i = 0; i < pthreadPoolSize; ++i) {
    PThread.allocateUnusedWorker();
   }
-  PThread.mainThreadBlock = 26288608;
+  PThread.mainThreadBlock = 26287024;
   for (var i = 0; i < 232 / 4; ++i) GROWABLE_HEAP_U32()[PThread.mainThreadBlock / 4 + i] = 0;
   GROWABLE_HEAP_I32()[PThread.mainThreadBlock + 12 >> 2] = PThread.mainThreadBlock;
   var headPtr = PThread.mainThreadBlock + 156;
   GROWABLE_HEAP_I32()[headPtr >> 2] = headPtr;
-  var tlsMemory = 26288848;
+  var tlsMemory = 26287264;
   for (var i = 0; i < 128; ++i) GROWABLE_HEAP_U32()[tlsMemory / 4 + i] = 0;
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 104 >> 2, tlsMemory);
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 40 >> 2, PThread.mainThreadBlock);
@@ -6208,7 +6208,7 @@ function _emscripten_get_pointerlock_status(pointerlockStatus) {
 }
 
 function _emscripten_get_sbrk_ptr() {
- return 26288448;
+ return 26286864;
 }
 
 function __webgl_enable_ANGLE_instanced_arrays(ctx) {
@@ -8150,6 +8150,10 @@ function _emscripten_set_keydown_callback_on_thread(target, userData, useCapture
  if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(19, 1, target, userData, useCapture, callbackfunc, targetThread);
  __registerKeyEventCallback(target, userData, useCapture, callbackfunc, 2, "keydown", targetThread);
  return 0;
+}
+
+function _emscripten_set_main_loop_arg(func, arg, fps, simulateInfiniteLoop) {
+ _emscripten_set_main_loop(func, fps, simulateInfiniteLoop, arg);
 }
 
 function __registerTouchEventCallback(target, userData, useCapture, callbackfunc, eventTypeId, eventTypeString, targetThread) {
@@ -10607,7 +10611,7 @@ var asmLibraryArg = {
  "emscripten_set_gamepadconnected_callback_on_thread": _emscripten_set_gamepadconnected_callback_on_thread,
  "emscripten_set_gamepaddisconnected_callback_on_thread": _emscripten_set_gamepaddisconnected_callback_on_thread,
  "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread,
- "emscripten_set_main_loop": _emscripten_set_main_loop,
+ "emscripten_set_main_loop_arg": _emscripten_set_main_loop_arg,
  "emscripten_set_touchcancel_callback_on_thread": _emscripten_set_touchcancel_callback_on_thread,
  "emscripten_set_touchend_callback_on_thread": _emscripten_set_touchend_callback_on_thread,
  "emscripten_set_touchmove_callback_on_thread": _emscripten_set_touchmove_callback_on_thread,
@@ -10803,7 +10807,7 @@ var dynCall_vii = Module["dynCall_vii"] = createExportWrapper("dynCall_vii");
 
 var dynCall_ii = Module["dynCall_ii"] = createExportWrapper("dynCall_ii");
 
-var dynCall_v = Module["dynCall_v"] = createExportWrapper("dynCall_v");
+var dynCall_vi = Module["dynCall_vi"] = createExportWrapper("dynCall_vi");
 
 var dynCall_iiii = Module["dynCall_iiii"] = createExportWrapper("dynCall_iiii");
 
@@ -10827,8 +10831,6 @@ var dynCall_iidiiii = Module["dynCall_iidiiii"] = createExportWrapper("dynCall_i
 
 var dynCall_jiji = Module["dynCall_jiji"] = createExportWrapper("dynCall_jiji");
 
-var dynCall_vi = Module["dynCall_vi"] = createExportWrapper("dynCall_vi");
-
 var dynCall_vffff = Module["dynCall_vffff"] = createExportWrapper("dynCall_vffff");
 
 var dynCall_vf = Module["dynCall_vf"] = createExportWrapper("dynCall_vf");
@@ -10840,6 +10842,8 @@ var dynCall_viiiiiiiii = Module["dynCall_viiiiiiiii"] = createExportWrapper("dyn
 var dynCall_i = Module["dynCall_i"] = createExportWrapper("dynCall_i");
 
 var dynCall_vff = Module["dynCall_vff"] = createExportWrapper("dynCall_vff");
+
+var dynCall_v = Module["dynCall_v"] = createExportWrapper("dynCall_v");
 
 var dynCall_viiiiiii = Module["dynCall_viiiiiii"] = createExportWrapper("dynCall_viiiiiii");
 

@@ -8,7 +8,7 @@
 #include "types.h"
 #define DEBUG_PRINT
 #include "console_output.h"
-#include "game_state.h"
+#include "game.h"
 #include "game_board.h"
 #include "event.h"
 
@@ -18,6 +18,15 @@ enum enum_selector_state {
     SELECTOR_STATE_AWAITING_TARGET,
     SELECTOR_STATE_ILLEGAL,
 };
+
+typedef struct selector_t {
+    Vector3 position;
+    Vector3 position_start;
+    unsigned int state;
+    unsigned int origin_piece;
+    Color color;
+    bool visible;
+} selector_t;
 
 void selector_get_coordinates_as_string(selector_t selector, char *result){
     snprintf(result, 5, "%c%c%c%c", 
@@ -55,46 +64,16 @@ void selector_pass_to_state_illegal(selector_t* selector){
         selector->position_start = selector->position;
 }
 
-void selector_process_state_ready(game_state_t* game_state) {
-    selector_process_keys(&game_state->selector);
-
-    if(IsKeyPressed(KEY_SPACE))
-    {
-        if (game_board_is_origin_position_legal(game_state->board, game_state->selector)) {
-            game_state->selector.state = SELECTOR_STATE_AWAITING_TARGET;
-            game_state->selector.position_start = game_state->selector.position;
-            game_state->selector.origin_piece = game_state->board[(int)game_state->selector.position.z][(int)game_state->selector.position.x];
-        } else {
-            selector_pass_to_state_illegal(&game_state->selector);
-        }
-    }
-}
-
-void selector_send_move_to_engine(game_state_t* game_state)
+void selector_send_move_to_engine(selector_t selector)
 {
     char coordinates[5] = {0};
-    selector_get_coordinates_as_string(game_state->selector, coordinates);
+    selector_get_coordinates_as_string(selector, coordinates);
 
     event_t event = {0};
     event.type = EVENT_COMMAND;
 
     sprintf(event.data, "%s", coordinates);
-    event_queue(event);
-}
-
-void selector_process_state_awaiting_target(game_state_t* game_state)
-{
-    selector_process_keys(&game_state->selector);
-
-    if(IsKeyPressed(KEY_SPACE))
-    {
-        if(game_board_is_target_position_legal(game_state->board, game_state->selector)){
-            game_state->selector.state = SELECTOR_STATE_DISABLED;
-            selector_send_move_to_engine(game_state);
-        } else {
-            selector_pass_to_state_illegal(&game_state->selector);
-        }
-    }
+    event_queue_enqueue(event);
 }
 
 void selector_pass_to_state_ready(selector_t* selector){
@@ -123,23 +102,6 @@ void selector_process_state_illegal(selector_t* selector){
 
 }
 
-void selector_update(game_state_t* game_state)
-{
-    switch(game_state->selector.state){
-        case SELECTOR_STATE_READY:
-            selector_process_state_ready(game_state);
-            break;
-        case SELECTOR_STATE_AWAITING_TARGET:
-            selector_process_state_awaiting_target(game_state);
-            break;
-        case SELECTOR_STATE_DISABLED:
-            break;
-        case SELECTOR_STATE_ILLEGAL:
-            selector_process_state_illegal(&game_state->selector);
-            break;
-    }
-}
-
 void selector_draw(selector_t selector)
 {
     switch(selector.state){
@@ -156,6 +118,78 @@ void selector_draw(selector_t selector)
             }
             break;
     }
+}
 
+bool selector_is_origin_position_legal(selector_t selector, unsigned int board[8][8]) {
+    unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
+    return  piece > 6;
+}
+
+bool selector_is_target_position_legal(selector_t selector, unsigned int board[8][8]) {
+    if(selector.position_start.x == selector.position.x && selector.position_start.z == selector.position.z)
+        return false;
+
+    unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
+    if(piece > 7)
+        return false;
+
+    switch (selector.origin_piece)
+    {
+    case PWN_W:
+        if(selector.position_start.z <= selector.position.z)
+            return false;
+        break;
+    default:
+        break;
+    }
+
+    return true;
+}
+
+void selector_process_state_awaiting_target(selector_t* selector, unsigned int board[8][8])
+{
+    selector_process_keys(selector);
+
+    if(IsKeyPressed(KEY_SPACE))
+    {
+        if(selector_is_target_position_legal(*selector, board)){
+            selector->state = SELECTOR_STATE_DISABLED;
+            selector_send_move_to_engine(*selector);
+        } else {
+            selector_pass_to_state_illegal(selector);
+        }
+    }
+}
+
+void selector_process_state_ready(selector_t* selector, unsigned int board[8][8]) {
+    selector_process_keys(selector);
+
+    if(IsKeyPressed(KEY_SPACE))
+    {
+        if (selector_is_origin_position_legal(*selector, board)) {
+            selector->state = SELECTOR_STATE_AWAITING_TARGET;
+            selector->position_start = selector->position;
+            selector->origin_piece = board[(int)selector->position.z][(int)selector->position.x];
+        } else {
+            selector_pass_to_state_illegal(selector);
+        }
+    }
+}
+
+void selector_update(selector_t* selector, unsigned int board[8][8])
+{
+    switch(selector->state){
+        case SELECTOR_STATE_READY:
+            selector_process_state_ready(selector, board);
+            break;
+        case SELECTOR_STATE_AWAITING_TARGET:
+            selector_process_state_awaiting_target(selector, board);
+            break;
+        case SELECTOR_STATE_DISABLED:
+            break;
+        case SELECTOR_STATE_ILLEGAL:
+            selector_process_state_illegal(selector);
+            break;
+    }
 }
 #endif

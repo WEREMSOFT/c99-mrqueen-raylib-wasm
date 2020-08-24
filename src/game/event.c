@@ -3,21 +3,22 @@
 #include <stdbool.h>
 
 #define EVENT_QUEUE_SIZE 100
+static event_queue_t events = {0};
 
-void queue_init() {
+void event_queue_init() {
     events.back = events.front = -1;
 }
 
-bool queue_is_empty() {
+bool event_queue_is_empty() {
     return events.front == -1;
 }
 
-bool queue_is_full() {
+bool event_queue_is_full() {
     return (events.front == events.back + 1) || (events.front == 0 && events.back == EVENT_QUEUE_SIZE -1);
 }
 
-int event_queue(event_t event) {
-    if(queue_is_full()) return -1;
+int event_queue_enqueue(event_t event) {
+    if(event_queue_is_full()) return -1;
     
     if(events.front == -1) events.front = 0;
 
@@ -28,9 +29,9 @@ int event_queue(event_t event) {
     return 0;
 }
 
-event_t event_dequeue() {
+event_t event_queue_dequeue() {
     event_t return_value = {0};
-    if(queue_is_empty()) return return_value;
+    if(event_queue_is_empty()) return return_value;
     
     return_value = events.events[events.front];
 

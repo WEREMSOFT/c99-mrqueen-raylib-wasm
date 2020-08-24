@@ -1,6 +1,6 @@
 #ifndef __LIGHT_SYSTEM_H__
 #define __LIGHT_SYSTEM_H__
-#include "game_state.h"
+#include "game.h"
 
 #if defined(OS_WEB)
 #define GLSL_VERSION            100
@@ -8,7 +8,7 @@
 #define GLSL_VERSION            330
 #endif
 
-void lights_init(game_state_t* game_state){
+void lights_init(game_context_t* game_state){
     game_state->shader = LoadShader(FormatText("./assets/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
                                 FormatText("./assets/shaders/glsl%i/lighting.fs", GLSL_VERSION));
 

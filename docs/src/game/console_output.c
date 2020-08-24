@@ -5,7 +5,6 @@
 #include "event.h"
 
 static char console_buffer[1000] = {0};
-static int pending_commands_count = 0;
 
 char* console_buffer_get() 
 {
@@ -24,7 +23,7 @@ void simple_printf(const char* fmt, ...)
     
     vsnprintf(event.data, 200, fmt, args);
 
-    event_queue(event);
+    event_queue_enqueue(event);
 
     va_end(args);
 
@@ -36,6 +35,6 @@ void simple_printf(const char* fmt, ...)
         strncpy(coordinates, command, 4);
         event.type = EVENT_RESPONSE;
         sprintf(event.data, coordinates);
-        event_queue(event);
+        event_queue_enqueue(event);
     }
 }

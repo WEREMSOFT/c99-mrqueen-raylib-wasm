@@ -2,11 +2,11 @@
 #define __GAME_BOARD_H__
 #include <stdbool.h>
 #include <raygui.h>
-#include "game_state.h"
+#include "game.h"
 #include "types.h"
 
-static char board_coord_x[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
-static char board_coord_y[8] = {'8', '7', '6', '5', '4', '3', '2', '1'};
+char board_coord_x[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+char board_coord_y[8] = {'8', '7', '6', '5', '4', '3', '2', '1'};
 
 enum ModelsEnum{
     MODEL_PAWN,
@@ -19,32 +19,6 @@ enum ModelsEnum{
 };
 
 Model models[MODEL_COUNT] = {0};
-
-bool game_board_is_origin_position_legal(unsigned int board[8][8], selector_t selector) {
-    unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
-    return  piece > 6;
-}
-
-bool game_board_is_target_position_legal(unsigned int board[8][8], selector_t selector) {
-    if(selector.position_start.x == selector.position.x && selector.position_start.z == selector.position.z)
-        return false;
-
-    unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
-    if(piece > 7)
-        return false;
-
-    switch (selector.origin_piece)
-    {
-    case PWN_W:
-        if(selector.position_start.z <= selector.position.z)
-            return false;
-        break;
-    default:
-        break;
-    }
-
-    return true;
-}
 
 typedef struct board_matrix_coordinates_t {
     unsigned int source_x;
@@ -117,10 +91,6 @@ void game_board_move_piece(unsigned int board[8][8], char *coords)
     board[coords_m.source_y][coords_m.source_x] = EMPTY;
 }
 
-void game_board_reset(game_state_t* game_state){
-    memcpy(game_state->board, base_board, sizeof(game_state->board));
-}
-
 void game_board_pieces_draw(int piece, Vector3 position)
 {
     Matrix rotation_matrix = MatrixRotateY(PI);
@@ -184,34 +154,34 @@ void game_board_pieces_draw(int piece, Vector3 position)
     }
 }
 
-void game_board_models_load(game_state_t* game_state){
+void game_board_models_load(Shader shader){
     models[MODEL_BISHOP] = LoadModel("assets/bishop.obj");
-    models[MODEL_BISHOP].materials[0].shader = game_state->shader;
+    models[MODEL_BISHOP].materials[0].shader = shader;
 
     models[MODEL_ROOK] = LoadModel("assets/rook.obj");
-    models[MODEL_ROOK].materials[0].shader = game_state->shader;
+    models[MODEL_ROOK].materials[0].shader = shader;
 
     models[MODEL_PAWN] = LoadModel("assets/pawn.obj");
-    models[MODEL_PAWN].materials[0].shader = game_state->shader;
+    models[MODEL_PAWN].materials[0].shader = shader;
 
     models[MODEL_KING] = LoadModel("assets/king.obj");
-    models[MODEL_KING].materials[0].shader = game_state->shader;
+    models[MODEL_KING].materials[0].shader = shader;
 
     models[MODEL_QUEEN] = LoadModel("assets/queen.obj");
-    models[MODEL_QUEEN].materials[0].shader = game_state->shader;
+    models[MODEL_QUEEN].materials[0].shader = shader;
 
     models[MODEL_KNIGHT] = LoadModel("assets/knight.obj");
-    models[MODEL_KNIGHT].materials[0].shader = game_state->shader;
+    models[MODEL_KNIGHT].materials[0].shader = shader;
 }
 
-void game_board_draw(game_state_t *game_state)
+void game_board_draw(unsigned int board[8][8])
 {
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
             Vector3 pos = (Vector3){i , -0.5f, j };
-            game_board_pieces_draw(game_state->board[j][i], pos);
+            game_board_pieces_draw(board[j][i], pos);
             DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : LIGHTGRAY);
         }
     }
