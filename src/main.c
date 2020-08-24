@@ -68,7 +68,7 @@ int main(void)
 
     selector_pass_to_state_ready(&game_context.selector);
 
-    game_board_reset(&game_context);
+    game_board_reset(game_context.board);
 
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
@@ -98,6 +98,7 @@ int main(void)
 #endif
     gui_fini();
     command_history_fini();
+    game_board_models_unload();
     UnloadTexture(game_context.background);
     CloseWindow();
     return 0;

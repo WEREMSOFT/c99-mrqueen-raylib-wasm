@@ -12,16 +12,6 @@
 #include "rlights.h"
 #include "gui_system.h"
 
-const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B, KGT_B, TWR_B},
-                            {PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B},
-                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
-                            {PWN_W, PWN_W, PWN_W, PWN_W, PWN_W, PWN_W, PWN_W, PWN_W},
-                            {TWR_W, KGT_W, BSP_W, QEN_W, KNG_W, BSP_W, KGT_W, TWR_W},
-                            };
-
 enum game_state_enum {
     GAME_STATE_PLAYING,
     GAME_STATE_ANIMATING,
@@ -68,10 +58,6 @@ void game_pass_to_state_animating(game_context_t* game_context, char* position){
     strncpy(game_context->target_position, position, 5);
 }
 
-void game_board_reset(game_context_t* game_state){
-    memcpy(game_state->board, base_board, sizeof(game_state->board));
-}
-
 void game_event_process(game_context_t* game_context){
     event_t event = {0};
     while((event = event_queue_dequeue()).type)
@@ -82,7 +68,7 @@ void game_event_process(game_context_t* game_context){
                 parse_line(commands[UCI]);
                 parse_line(commands[UCINEWGAME]);
                 parse_line((char *)&commands[ISREADY]);
-                game_board_reset(game_context);
+                game_board_reset(game_context->board);
                 char *history_buffer = command_history_get_buffer();
                 memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
                 game_context->state = GAME_STATE_PLAYING;

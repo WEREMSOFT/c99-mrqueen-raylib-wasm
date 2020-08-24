@@ -3,10 +3,38 @@
 #include <stdbool.h>
 #include <raygui.h>
 #include "game.h"
-#include "types.h"
+
+enum enum_pieces
+{
+    EMPTY,
+    PWN_B,
+    TWR_B,
+    BSP_B,
+    KGT_B,
+    KNG_B,
+    QEN_B,
+    PWN_W,
+    TWR_W,
+    BSP_W,
+    KGT_W,
+    KNG_W,
+    QEN_W,
+    PIECE_IN_MOTION,
+    PIECES_COUNT
+};
 
 char board_coord_x[8] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 char board_coord_y[8] = {'8', '7', '6', '5', '4', '3', '2', '1'};
+
+const unsigned int base_board[8][8] = {{TWR_B, KGT_B, BSP_B, QEN_B, KNG_B, BSP_B, KGT_B, TWR_B},
+                            {PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B, PWN_B},
+                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                            {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+                            {PWN_W, PWN_W, PWN_W, PWN_W, PWN_W, PWN_W, PWN_W, PWN_W},
+                            {TWR_W, KGT_W, BSP_W, QEN_W, KNG_W, BSP_W, KGT_W, TWR_W},
+                            };
 
 enum ModelsEnum{
     MODEL_PAWN,
@@ -20,16 +48,20 @@ enum ModelsEnum{
 
 Model models[MODEL_COUNT] = {0};
 
-typedef struct board_matrix_coordinates_t {
+typedef struct game_board_matrix_coordinates_t {
     unsigned int source_x;
     unsigned int source_y;
     unsigned int target_x;
     unsigned int target_y;
 
-} board_matrix_coordinates_t;
+} game_board_matrix_coordinates_t;
 
-board_matrix_coordinates_t game_board_get_coordinates_in_matrix(char *coords){
-    board_matrix_coordinates_t return_value = {0};
+void game_board_reset(unsigned int board[8][8]){
+    memcpy(board, base_board, sizeof(board) * sizeof(board[0]));
+}
+
+game_board_matrix_coordinates_t game_board_get_coordinates_in_matrix(char *coords){
+    game_board_matrix_coordinates_t return_value = {0};
 
     return_value.source_x = (unsigned int)(strchr(board_coord_x, coords[0]) - board_coord_x);
     return_value.source_y = (unsigned int)(strchr(board_coord_y, coords[1]) - board_coord_y);
@@ -40,7 +72,7 @@ board_matrix_coordinates_t game_board_get_coordinates_in_matrix(char *coords){
 }
 
 Vector3 game_board_get_target_coordinates_in_world(char *coords){
-    board_matrix_coordinates_t coords_m = {0};
+    game_board_matrix_coordinates_t coords_m = {0};
 
     coords_m = game_board_get_coordinates_in_matrix(coords);
 
@@ -50,7 +82,7 @@ Vector3 game_board_get_target_coordinates_in_world(char *coords){
 }
 
 Vector3 game_board_get_source_coordinates_in_world(char *coords){
-    board_matrix_coordinates_t coords_m = {0};
+    game_board_matrix_coordinates_t coords_m = {0};
 
     coords_m = game_board_get_coordinates_in_matrix(coords);
 
@@ -60,32 +92,32 @@ Vector3 game_board_get_source_coordinates_in_world(char *coords){
 }
 
 unsigned int game_board_get_piece_at_target(unsigned int board[8][8], char *coords){
-    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+    game_board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
     
     return board[coords_m.target_y][coords_m.target_x];
 }
 
 unsigned int game_board_get_piece_at_source(unsigned int board[8][8], char *coords){
-    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+    game_board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
     
     return board[coords_m.source_y][coords_m.source_x];
 }
 
 void game_board_set_piece_at_source(unsigned int board[8][8], char *coords, unsigned int piece){
-    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+    game_board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
 
     board[coords_m.source_y][coords_m.source_x] = piece;
 }
 
 void game_board_set_piece_at_target(unsigned int board[8][8], char *coords, unsigned int piece){
-    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+    game_board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
 
     board[coords_m.target_y][coords_m.target_x] = piece;
 }
 
 void game_board_move_piece(unsigned int board[8][8], char *coords)
 {
-    board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
+    game_board_matrix_coordinates_t coords_m = game_board_get_coordinates_in_matrix(coords);
     
     board[coords_m.target_y][coords_m.target_x] = board[coords_m.source_y][coords_m.source_x];
     board[coords_m.source_y][coords_m.source_x] = EMPTY;
@@ -172,6 +204,12 @@ void game_board_models_load(Shader shader){
 
     models[MODEL_KNIGHT] = LoadModel("assets/knight.obj");
     models[MODEL_KNIGHT].materials[0].shader = shader;
+}
+
+void game_board_models_unload(){
+    for(int i = 0; i < MODEL_COUNT; i++){
+        UnloadModel(models[i]);
+    }
 }
 
 void game_board_draw(unsigned int board[8][8])
