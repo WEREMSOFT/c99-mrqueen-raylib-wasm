@@ -207,63 +207,63 @@ Module.expectedDataFileDownloads++;
  };
  loadPackage({
   "files": [ {
-   "filename": "/assets/background_fight.png",
-   "start": 0,
-   "end": 1606577,
-   "audio": 0
-  }, {
    "filename": "/assets/rook.obj",
-   "start": 1606577,
-   "end": 1795599,
+   "start": 0,
+   "end": 189022,
    "audio": 0
   }, {
    "filename": "/assets/king.obj",
-   "start": 1795599,
-   "end": 2586435,
+   "start": 189022,
+   "end": 979858,
+   "audio": 0
+  }, {
+   "filename": "/assets/background.png",
+   "start": 979858,
+   "end": 3676928,
    "audio": 0
   }, {
    "filename": "/assets/knight.obj",
-   "start": 2586435,
-   "end": 2826088,
+   "start": 3676928,
+   "end": 3916581,
    "audio": 0
   }, {
    "filename": "/assets/pawn.obj",
-   "start": 2826088,
-   "end": 4034929,
+   "start": 3916581,
+   "end": 5125422,
    "audio": 0
   }, {
    "filename": "/assets/bishop.obj",
-   "start": 4034929,
-   "end": 4824727,
+   "start": 5125422,
+   "end": 5915220,
    "audio": 0
   }, {
    "filename": "/assets/queen.obj",
-   "start": 4824727,
-   "end": 6212774,
+   "start": 5915220,
+   "end": 7303267,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl100/base_lighting.vs",
-   "start": 6212774,
-   "end": 6214352,
+   "start": 7303267,
+   "end": 7304845,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl100/lighting.fs",
-   "start": 6214352,
-   "end": 6216404,
+   "start": 7304845,
+   "end": 7306897,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl330/base_lighting.vs",
-   "start": 6216404,
-   "end": 6217181,
+   "start": 7306897,
+   "end": 7307674,
    "audio": 0
   }, {
    "filename": "/assets/shaders/glsl330/lighting.fs",
-   "start": 6217181,
-   "end": 6219223,
+   "start": 7307674,
+   "end": 7309716,
    "audio": 0
   } ],
-  "remote_package_size": 6219223,
-  "package_uuid": "a3f55d3f-4fdc-48ba-8f3f-77ae6d496ba6"
+  "remote_package_size": 7309716,
+  "package_uuid": "9b28ad6b-b487-4d03-848e-2f77568fb0a3"
  });
 })();
 
@@ -1314,7 +1314,7 @@ function updateGlobalBufferAndViews(buf) {
  Module["HEAPF64"] = HEAPF64 = new Float64Array(buf);
 }
 
-var STATIC_BASE = 1024, STACK_BASE = 31530688, STACKTOP = STACK_BASE, STACK_MAX = 26287808, DYNAMIC_BASE = 31530688, DYNAMICTOP_PTR = 26286880;
+var STATIC_BASE = 1024, STACK_BASE = 31530672, STACKTOP = STACK_BASE, STACK_MAX = 26287792, DYNAMIC_BASE = 31530672, DYNAMICTOP_PTR = 26286864;
 
 assert(STACK_BASE % 16 === 0, "stack must start aligned");
 
@@ -1808,10 +1808,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 209819: function() {
+ 209803: function() {
   throw "Canceled!";
  },
- 210067: function($0, $1) {
+ 210051: function($0, $1) {
   setTimeout(function() {
    _do_emscripten_dispatch_to_thread($0, $1);
   }, 0);
@@ -1991,7 +1991,7 @@ var ERRNO_CODES = {
  ESTRPIPE: 135
 };
 
-var __main_thread_futex_wait_address = 26287792;
+var __main_thread_futex_wait_address = 26287776;
 
 function _emscripten_futex_wake(addr, count) {
  if (addr <= 0 || addr > GROWABLE_HEAP_I8().length || addr & 3 != 0 || count < 0) return -28;
@@ -2063,12 +2063,12 @@ var PThread = {
   for (var i = 0; i < pthreadPoolSize; ++i) {
    PThread.allocateUnusedWorker();
   }
-  PThread.mainThreadBlock = 26287040;
+  PThread.mainThreadBlock = 26287024;
   for (var i = 0; i < 232 / 4; ++i) GROWABLE_HEAP_U32()[PThread.mainThreadBlock / 4 + i] = 0;
   GROWABLE_HEAP_I32()[PThread.mainThreadBlock + 12 >> 2] = PThread.mainThreadBlock;
   var headPtr = PThread.mainThreadBlock + 156;
   GROWABLE_HEAP_I32()[headPtr >> 2] = headPtr;
-  var tlsMemory = 26287280;
+  var tlsMemory = 26287264;
   for (var i = 0; i < 128; ++i) GROWABLE_HEAP_U32()[tlsMemory / 4 + i] = 0;
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 104 >> 2, tlsMemory);
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 40 >> 2, PThread.mainThreadBlock);
@@ -6208,7 +6208,7 @@ function _emscripten_get_pointerlock_status(pointerlockStatus) {
 }
 
 function _emscripten_get_sbrk_ptr() {
- return 26286880;
+ return 26286864;
 }
 
 function __webgl_enable_ANGLE_instanced_arrays(ctx) {

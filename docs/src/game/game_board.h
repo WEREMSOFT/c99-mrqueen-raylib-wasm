@@ -60,6 +60,85 @@ void game_board_reset(unsigned int board[8][8]){
     memcpy(board, base_board, sizeof(board) * 64);
 }
 
+void game_board_calculate_attacked_positions(unsigned int board[8][8], unsigned int attack_board[8][8]){
+    memset(attack_board, 0x00, sizeof(attack_board) * 64);
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            switch (board[j][i])
+            {
+                case PWN_B:
+                    if(j+1 < 8 && i+1 < 8){
+                        attack_board[j+1][i+1] = true;
+                    }
+                    if(j+1 < 8 && i-1 >= 0){
+                        attack_board[j+1][i-1] = true;
+                    }
+                    break;
+                case KGT_B:
+                    if(j+2 < 8 && i+1 < 8){
+                        attack_board[j+2][i+1] = true;
+                    }
+                    if(j+2 < 8 && i-1 >= 0){
+                        attack_board[j+2][i-1] = true;
+                    }
+                    if(j+1 < 8 && i-2 >= 0){
+                        attack_board[j+1][i-2] = true;
+                    }
+                    if(j+1 < 8 && i+2 < 8){
+                        attack_board[j+1][i+2] = true;
+                    }
+                    break;
+                case BSP_B:
+                    {
+                        int pos_j = j;
+                        int pos_i = i;
+                        while(pos_j+1 < 8 && pos_i+1 < 8){
+                            attack_board[++pos_j][++pos_i] = true;
+                            if(board[pos_j][pos_i] != EMPTY) break;
+                        }
+                        pos_j = j;
+                        pos_i = i;
+                        while(pos_j+1 < 8 && pos_i-1 >= 0){
+                            attack_board[++pos_j][--pos_i] = true;
+                            if(board[pos_j][pos_i] != EMPTY) break;
+                        }
+                    }
+                    break;
+                case TWR_B:
+                    {
+                        int pos_j = j;
+                        int pos_i = i;
+                        while(pos_j+1 < 8){
+                            attack_board[++pos_j][pos_i] = true;
+                            if(board[pos_j][pos_i] != EMPTY) break;
+                        }
+                        pos_j = j;
+                        pos_i = i;
+                        while(pos_j-1 >= 0){
+                            attack_board[--pos_j][pos_i] = true;
+                            if(board[pos_j][pos_i] != EMPTY) break;
+                        }
+                        pos_j = j;
+                        pos_i = i;
+                        while(pos_i+1 < 8){
+                            attack_board[pos_j][++pos_i] = true;
+                            if(board[pos_j][pos_i] != EMPTY) break;
+                        }
+                        pos_j = j;
+                        pos_i = i;
+                        while(pos_i-1 >= 0){
+                            attack_board[pos_j][--pos_i] = true;
+                            if(board[pos_j][pos_i] != EMPTY) break;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
+
 game_board_matrix_coordinates_t game_board_get_coordinates_in_matrix(char *coords){
     game_board_matrix_coordinates_t return_value = {0};
 
@@ -221,6 +300,19 @@ void game_board_draw(unsigned int board[8][8])
             Vector3 pos = (Vector3){i , -0.5f, j };
             game_board_pieces_draw(board[j][i], pos);
             DrawCube(pos, 1.0f, 0.2f, 1.0f, ((i + j) % 2) ? DARKGRAY : LIGHTGRAY);
+        }
+    }
+}
+
+void game_board_attaked_positions_draw(unsigned int board[8][8])
+{
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            Vector3 pos = (Vector3){i , -0.5f, j };
+            if(board[j][i])
+                DrawCube(pos, 1.0f, 0.3f, 1.0f, BROWN);
         }
     }
 }

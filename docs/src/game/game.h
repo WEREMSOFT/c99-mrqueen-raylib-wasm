@@ -26,6 +26,7 @@ typedef struct game_context_t
 {
     int state;
     unsigned int board[8][8];
+    unsigned int board_attacked_positions[8][8];
     char textBoxText[1000];
     Camera3D camera_perspective;
     Camera3D camera_top;
@@ -52,8 +53,44 @@ char commands[COMMAND_COUNT][50] = {
     "stop"
 };
 
+static Camera3D camera_perspective_init()
+{
+    Camera3D return_value = {0};
 
-void game_pass_to_state_animating(game_context_t* game_context, char* position){
+    return_value.fovy = 45.0f;
+    return_value.target = (Vector3){3.5f, 0.0f, 2.f};
+    return_value.type = CAMERA_PERSPECTIVE;
+    return_value.up = (Vector3){0, 1.0f, 0};
+    return_value.position = (Vector3){3.5f, 6.0f, 13.0f};
+    return return_value;
+}
+
+static Camera3D camera_top_init()
+{
+    Camera3D return_value = {0};
+
+    return_value.fovy = 45.0f;
+    return_value.target = (Vector3){-20.f, 0.0f, 20.f};
+    return_value.type = CAMERA_ORTHOGRAPHIC;
+    return_value.up = (Vector3){0, 0, -1.0f};
+    return_value.position = (Vector3){-20.f, 20.0f, 20.0f};
+    return return_value;
+}
+
+game_context_t game_context_init(){
+    game_context_t game_context = {0};
+
+    game_context.background = LoadTexture("assets/background.png");
+    game_context.background.width = WIDTH;
+    game_context.background.height = HEIGHT;
+
+    game_context.camera_top = camera_top_init();
+    game_context.camera_perspective = camera_perspective_init();
+
+    return game_context;
+}
+
+void game_context_pass_to_state_animating(game_context_t* game_context, char* position){
     game_context->state = GAME_STATE_ANIMATING;
     game_context->piece_to_move_lerp_percentage = 0;
     game_context->piece_to_move = game_board_get_piece_at_source(game_context->board, position);
@@ -63,7 +100,7 @@ void game_pass_to_state_animating(game_context_t* game_context, char* position){
     strncpy(game_context->target_position, position, 5);
 }
 
-void game_pass_to_state_castling_white_right(game_context_t* game_context){
+void game_context_pass_to_state_castling_white_right(game_context_t* game_context){
     game_context->state = GAME_STATE_CASTLING_WHITE_RIGHT;
     game_context->piece_to_move_lerp_percentage = 0;
 
@@ -77,7 +114,7 @@ void game_pass_to_state_castling_white_right(game_context_t* game_context){
     game_board_set_piece_at_source(game_context->board, "f1xx", PIECE_IN_MOTION);
 }
 
-void game_pass_to_state_castling_white_left(game_context_t* game_context){
+void game_context_pass_to_state_castling_white_left(game_context_t* game_context){
     game_context->state = GAME_STATE_CASTLING_WHITE_LEFT;
     game_context->piece_to_move_lerp_percentage = 0;
 
@@ -91,7 +128,7 @@ void game_pass_to_state_castling_white_left(game_context_t* game_context){
     game_board_set_piece_at_source(game_context->board, "a1xx", PIECE_IN_MOTION);
 }
 
-void game_event_process(game_context_t* game_context){
+void game_context_event_process(game_context_t* game_context){
     event_t event = {0};
     while((event = event_queue_dequeue()).type)
     {
@@ -113,7 +150,7 @@ void game_event_process(game_context_t* game_context){
                 printf("position sent %s", event.data);
 
                 if(game_context->state == GAME_STATE_ANIMATING || game_context->state == GAME_STATE_PLAYING){
-                    game_pass_to_state_animating(game_context, event.data);
+                    game_context_pass_to_state_animating(game_context, event.data);
                     command_history_add_command(" ");
                     command_history_add_command(event.data);
                     selector_pass_to_state_ready(&game_context->selector);
@@ -135,16 +172,16 @@ void game_event_process(game_context_t* game_context){
                     if(strcmp(event.data, "e1g1") == 0
                         && TWR_W == game_board_get_piece_at_source(game_context->board, "h1xx")
                         && EMPTY == game_board_get_piece_at_source(game_context->board, "f1xx")){
-                        game_pass_to_state_castling_white_right(game_context);
+                        game_context_pass_to_state_castling_white_right(game_context);
                     } else if(strcmp(event.data, "e1c1") == 0
                         && TWR_W == game_board_get_piece_at_source(game_context->board, "a1xx")
                         && EMPTY == game_board_get_piece_at_source(game_context->board, "b1xx")
                         && EMPTY == game_board_get_piece_at_source(game_context->board, "c1xx")
                         && EMPTY == game_board_get_piece_at_source(game_context->board, "d1xx")
                         ){
-                        game_pass_to_state_castling_white_left(game_context);
+                        game_context_pass_to_state_castling_white_left(game_context);
                     } else {
-                        game_pass_to_state_animating(game_context, event.data);
+                        game_context_pass_to_state_animating(game_context, event.data);
                     }
 
                     parse_line(commands[GO]);
@@ -161,18 +198,20 @@ void game_event_process(game_context_t* game_context){
     }
 }
 
-void game_draw_pre() {
+void game_context_draw_pre() {
     ui_pre_frame_update();
 }
 
-void game_draw(game_context_t* game_context) {
+void game_context_draw(game_context_t* game_context) {
     BeginDrawing();
     ClearBackground(LIGHTGRAY);
     DrawTexture(game_context->background, 0, 0, WHITE);
+    game_board_calculate_attacked_positions(game_context->board, game_context->board_attacked_positions);
     
     BeginMode3D(game_context->camera_perspective);
     {
         game_board_draw(game_context->board);
+        game_board_attaked_positions_draw(game_context->board_attacked_positions);
         selector_draw(game_context->selector);
     }
     EndMode3D();
@@ -180,31 +219,32 @@ void game_draw(game_context_t* game_context) {
     BeginMode3D(game_context->camera_top);
     {
         game_board_draw(game_context->board);
+        game_board_attaked_positions_draw(game_context->board_attacked_positions);
         selector_draw(game_context->selector);
     }
     EndMode3D();
 }
 
-void game_draw_post() {
+void game_context_draw_post() {
     gui_draw();           
     DrawFPS(900, 19);
     EndDrawing();
 }
 
-void game_update(game_context_t* game_state)
+void game_context_update(game_context_t* game_state)
 {
-    game_event_process(game_state);
+    game_context_event_process(game_state);
     
     switch (game_state->state){
         case GAME_STATE_PLAYING:
             selector_update(&game_state->selector, game_state->board);
-            game_draw_pre();
-            game_draw(game_state);
-            game_draw_post();
+            game_context_draw_pre();
+            game_context_draw(game_state);
+            game_context_draw_post();
             break;
         case GAME_STATE_WON_WHITE:
-            game_draw_pre();
-            game_draw(game_state);
+            game_context_draw_pre();
+            game_context_draw(game_state);
 
             DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
             DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
@@ -212,11 +252,11 @@ void game_update(game_context_t* game_state)
             DrawText("WHITE WINS", 255, HEIGHT/3 + 105, 70, BLACK);
             DrawText("WHITE WINS", 250, HEIGHT/3 + 100, 70, WHITE);
 
-            game_draw_post();
+            game_context_draw_post();
             break;
         case GAME_STATE_WON_BLACK:
-            game_draw_pre();
-            game_draw(game_state);
+            game_context_draw_pre();
+            game_context_draw(game_state);
 
             DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
             DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
@@ -224,7 +264,7 @@ void game_update(game_context_t* game_state)
             DrawText("BLACK WINS", 255, HEIGHT/3 + 105, 70, WHITE);
             DrawText("BLACK WINS", 250, HEIGHT/3 + 100, 70, BLACK);
 
-            game_draw_post();
+            game_context_draw_post();
             break;
         case GAME_STATE_ANIMATING:
             game_state->piece_to_move_lerp_percentage += 0.01;
@@ -245,7 +285,7 @@ void game_update(game_context_t* game_state)
                         game_state->state = GAME_STATE_WON_BLACK;
                     }
             }
-            game_draw_pre();
+            game_context_draw_pre();
 
             ClearBackground(LIGHTGRAY);
             DrawTexture(game_state->background, 0, 0, WHITE);
@@ -265,7 +305,7 @@ void game_update(game_context_t* game_state)
                 selector_draw(game_state->selector);
             }
             EndMode3D();
-            game_draw_post(game_state);
+            game_context_draw_post(game_state);
             break;
 
         case GAME_STATE_CASTLING_WHITE_RIGHT:
@@ -282,7 +322,7 @@ void game_update(game_context_t* game_state)
 
                     game_state->state = GAME_STATE_PLAYING;
             }
-            game_draw_pre();
+            game_context_draw_pre();
 
             ClearBackground(LIGHTGRAY);
             DrawTexture(game_state->background, 0, 0, WHITE);
@@ -301,7 +341,7 @@ void game_update(game_context_t* game_state)
                 game_board_pieces_draw(game_state->piece_to_move, game_state->piece_to_move_position_actual);
             }
             EndMode3D();
-            game_draw_post(game_state);
+            game_context_draw_post(game_state);
             break;
         case GAME_STATE_CASTLING_WHITE_LEFT:
             game_state->piece_to_move_lerp_percentage += 0.01;
@@ -317,7 +357,7 @@ void game_update(game_context_t* game_state)
 
                     game_state->state = GAME_STATE_PLAYING;
             }
-            game_draw_pre();
+            game_context_draw_pre();
 
             ClearBackground(LIGHTGRAY);
             DrawTexture(game_state->background, 0, 0, WHITE);
@@ -336,7 +376,7 @@ void game_update(game_context_t* game_state)
                 game_board_pieces_draw(game_state->piece_to_move, game_state->piece_to_move_position_actual);
             }
             EndMode3D();
-            game_draw_post();
+            game_context_draw_post();
             break;
     }
 
