@@ -89,6 +89,19 @@ void game_board_calculate_attacked_positions(unsigned int board[8][8], unsigned 
                     if(j+1 < 8 && i+2 < 8){
                         attack_board[j+1][i+2] = true;
                     }
+
+                    if(j-2 >= 0 && i-1 >= 0){
+                        attack_board[j-2][i-1] = true;
+                    }
+                    if(j-2 >= 0 && i+1 < 8){
+                        attack_board[j-2][i+1] = true;
+                    }
+                    if(j-1 >= 0 && i+2 < 8){
+                        attack_board[j-1][i+2] = true;
+                    }
+                    if(j-1 >= 0 && i-2 >= 0){
+                        attack_board[j-1][i-2] = true;
+                    }
                     break;
                 case BSP_B:
                     {

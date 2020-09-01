@@ -43,6 +43,7 @@ typedef struct game_context_t
     Vector3 piece_castlint_position_target;
     float piece_to_move_lerp_percentage;
     unsigned int piece_to_move;
+    bool board_dirty;
 } game_context_t;
 
 char commands[COMMAND_COUNT][50] = {
@@ -144,16 +145,17 @@ void game_context_event_process(game_context_t* game_context){
                 game_context->state = GAME_STATE_PLAYING;
                 selector_pass_to_state_ready(&game_context->selector);
                 event_queue_init();
+                game_context->board_dirty = true;
                 break;
             case EVENT_RESPONSE:
             {
                 printf("position sent %s", event.data);
-
                 if(game_context->state == GAME_STATE_ANIMATING || game_context->state == GAME_STATE_PLAYING){
                     game_context_pass_to_state_animating(game_context, event.data);
                     command_history_add_command(" ");
                     command_history_add_command(event.data);
                     selector_pass_to_state_ready(&game_context->selector);
+                    game_context->board_dirty = true;
                 }
 
             }
@@ -183,10 +185,10 @@ void game_context_event_process(game_context_t* game_context){
                     } else {
                         game_context_pass_to_state_animating(game_context, event.data);
                     }
-
                     parse_line(commands[GO]);
                     command_history_add_command(" ");
                     command_history_add_command(event.data);
+                    game_context->board_dirty = true;
                 }
                 break;
             case EVENT_LOG:
@@ -202,25 +204,30 @@ void game_context_draw_pre() {
     ui_pre_frame_update();
 }
 
+static void game_context_build_scene(game_context_t* game_context){
+    game_board_draw(game_context->board);
+    game_board_attaked_positions_draw(game_context->board_attacked_positions);
+    selector_draw(game_context->selector);
+}
+
 void game_context_draw(game_context_t* game_context) {
     BeginDrawing();
     ClearBackground(LIGHTGRAY);
     DrawTexture(game_context->background, 0, 0, WHITE);
-    game_board_calculate_attacked_positions(game_context->board, game_context->board_attacked_positions);
+    if(game_context->board_dirty){
+        game_board_calculate_attacked_positions(game_context->board, game_context->board_attacked_positions);
+        game_context->board_dirty = false;
+    }
     
     BeginMode3D(game_context->camera_perspective);
     {
-        game_board_draw(game_context->board);
-        game_board_attaked_positions_draw(game_context->board_attacked_positions);
-        selector_draw(game_context->selector);
+        game_context_build_scene(game_context);
     }
     EndMode3D();
 
     BeginMode3D(game_context->camera_top);
     {
-        game_board_draw(game_context->board);
-        game_board_attaked_positions_draw(game_context->board_attacked_positions);
-        selector_draw(game_context->selector);
+        game_context_build_scene(game_context);
     }
     EndMode3D();
 }

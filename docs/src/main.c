@@ -52,6 +52,7 @@ int main(void)
     bb_init();
     prng_seed(time(NULL));
     uci_board_reset();
+    game_board_calculate_attacked_positions(game_context.board, game_context.board_attacked_positions);
 
 #ifdef OS_WEB
     emscripten_set_main_loop_arg(game_context_update, &game_context, 0, 1);
