@@ -61,7 +61,7 @@ void gui_draw(game_options_t *game_options){
             igEndMenu();
         }
         if (igBeginMenu("Options", true)) {
-            if(igMenuItemBool("Show attacked positions", "", game_options->draw_attacked_positions, true)){
+            if(igMenuItemBool("Show attacked positions ", "", game_options->draw_attacked_positions, true)){
                 game_options->draw_attacked_positions = !game_options->draw_attacked_positions;
             }
             igEndMenu();
