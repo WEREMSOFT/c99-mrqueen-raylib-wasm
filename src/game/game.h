@@ -27,7 +27,6 @@ typedef struct game_context_t
 {
     int state;
     unsigned int board[8][8];
-    unsigned int board_attacked_positions[8][8];
     char textBoxText[1000];
     Camera3D camera_perspective;
     Camera3D camera_top;
@@ -42,7 +41,6 @@ typedef struct game_context_t
     Vector3 piece_to_move_position_target;
     Vector3 piece_castling_position_actual;
     Vector3 piece_castlint_position_target;
-    Vector3 white_king_position;
     float piece_to_move_lerp_percentage;
     unsigned int piece_to_move;
     bool board_dirty;
@@ -57,7 +55,7 @@ char commands[COMMAND_COUNT][50] = {
 };
 
 void game_board_calculate_attacked_positions(game_context_t* game_context){
-    memset(game_context->board_attacked_positions, 0x00, sizeof(unsigned int) * 64);
+    memset(game_context->selector.board_attacked_positions, 0x00, sizeof(unsigned int) * 64);
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -65,42 +63,42 @@ void game_board_calculate_attacked_positions(game_context_t* game_context){
             switch (game_context->board[j][i])
             {
                 case KNG_W:
-                    game_context->white_king_position.x = j;
-                    game_context->white_king_position.y = i;
+                    game_context->selector.white_king_position.x = j;
+                    game_context->selector.white_king_position.y = i;
                     break;
                 case PWN_B:
                     if(j+1 < 8 && i+1 < 8){
-                        game_context->board_attacked_positions[j+1][i+1] = true;
+                        game_context->selector.board_attacked_positions[j+1][i+1] = true;
                     }
                     if(j+1 < 8 && i-1 >= 0){
-                        game_context->board_attacked_positions[j+1][i-1] = true;
+                        game_context->selector.board_attacked_positions[j+1][i-1] = true;
                     }
                     break;
                 case KGT_B:
                     if(j+2 < 8 && i+1 < 8){
-                        game_context->board_attacked_positions[j+2][i+1] = true;
+                        game_context->selector.board_attacked_positions[j+2][i+1] = true;
                     }
                     if(j+2 < 8 && i-1 >= 0){
-                        game_context->board_attacked_positions[j+2][i-1] = true;
+                        game_context->selector.board_attacked_positions[j+2][i-1] = true;
                     }
                     if(j+1 < 8 && i-2 >= 0){
-                        game_context->board_attacked_positions[j+1][i-2] = true;
+                        game_context->selector.board_attacked_positions[j+1][i-2] = true;
                     }
                     if(j+1 < 8 && i+2 < 8){
-                        game_context->board_attacked_positions[j+1][i+2] = true;
+                        game_context->selector.board_attacked_positions[j+1][i+2] = true;
                     }
 
                     if(j-2 >= 0 && i-1 >= 0){
-                        game_context->board_attacked_positions[j-2][i-1] = true;
+                        game_context->selector.board_attacked_positions[j-2][i-1] = true;
                     }
                     if(j-2 >= 0 && i+1 < 8){
-                        game_context->board_attacked_positions[j-2][i+1] = true;
+                        game_context->selector.board_attacked_positions[j-2][i+1] = true;
                     }
                     if(j-1 >= 0 && i+2 < 8){
-                        game_context->board_attacked_positions[j-1][i+2] = true;
+                        game_context->selector.board_attacked_positions[j-1][i+2] = true;
                     }
                     if(j-1 >= 0 && i-2 >= 0){
-                        game_context->board_attacked_positions[j-1][i-2] = true;
+                        game_context->selector.board_attacked_positions[j-1][i-2] = true;
                     }
                     break;
                 case BSP_B:
@@ -108,13 +106,13 @@ void game_board_calculate_attacked_positions(game_context_t* game_context){
                         int pos_j = j;
                         int pos_i = i;
                         while(pos_j+1 < 8 && pos_i+1 < 8){
-                            game_context->board_attacked_positions[++pos_j][++pos_i] = true;
+                            game_context->selector.board_attacked_positions[++pos_j][++pos_i] = true;
                             if(game_context->board[pos_j][pos_i] != EMPTY) break;
                         }
                         pos_j = j;
                         pos_i = i;
                         while(pos_j+1 < 8 && pos_i-1 >= 0){
-                            game_context->board_attacked_positions[++pos_j][--pos_i] = true;
+                            game_context->selector.board_attacked_positions[++pos_j][--pos_i] = true;
                             if(game_context->board[pos_j][pos_i] != EMPTY) break;
                         }
                     }
@@ -124,25 +122,25 @@ void game_board_calculate_attacked_positions(game_context_t* game_context){
                         int pos_j = j;
                         int pos_i = i;
                         while(pos_j+1 < 8){
-                            game_context->board_attacked_positions[++pos_j][pos_i] = true;
+                            game_context->selector.board_attacked_positions[++pos_j][pos_i] = true;
                             if(game_context->board[pos_j][pos_i] != EMPTY) break;
                         }
                         pos_j = j;
                         pos_i = i;
                         while(pos_j-1 >= 0){
-                            game_context->board_attacked_positions[--pos_j][pos_i] = true;
+                            game_context->selector.board_attacked_positions[--pos_j][pos_i] = true;
                             if(game_context->board[pos_j][pos_i] != EMPTY) break;
                         }
                         pos_j = j;
                         pos_i = i;
                         while(pos_i+1 < 8){
-                            game_context->board_attacked_positions[pos_j][++pos_i] = true;
+                            game_context->selector.board_attacked_positions[pos_j][++pos_i] = true;
                             if(game_context->board[pos_j][pos_i] != EMPTY) break;
                         }
                         pos_j = j;
                         pos_i = i;
                         while(pos_i-1 >= 0){
-                            game_context->board_attacked_positions[pos_j][--pos_i] = true;
+                            game_context->selector.board_attacked_positions[pos_j][--pos_i] = true;
                             if(game_context->board[pos_j][pos_i] != EMPTY) break;
                         }
                     }
@@ -255,10 +253,6 @@ void game_context_pass_to_state_castling_white_left(game_context_t* game_context
     game_board_set_piece_at_source(game_context->board, "a1xx", PIECE_IN_MOTION);
 }
 
-bool game_context_is_absolute_pin(game_context_t* game_context){
-    return game_context->board_attacked_positions[(int)game_context->white_king_position.x][(int)game_context->white_king_position.y];
-}
-
 void game_context_event_process(game_context_t* game_context){
     event_t event = {0};
     while((event = event_queue_dequeue()).type)
@@ -349,7 +343,7 @@ void game_context_draw_pre() {
 
 static void game_context_build_scene(game_context_t* game_context){
     game_board_draw(game_context->board);
-    game_board_attaked_positions_draw(game_context->board_attacked_positions);
+    game_board_attaked_positions_draw(game_context->selector.board_attacked_positions);
     selector_draw(game_context->selector);
 }
 
@@ -403,7 +397,7 @@ void game_context_update(game_context_t* game_context)
 
     switch (game_context->state){
         case GAME_STATE_PLAYING:
-            selector_update(&game_context->selector, game_context->board);
+            selector_update(&game_context->selector, game_context->board, game_context->selector.board_attacked_positions);
             game_context_draw_pre();
             game_context_draw(game_context);
             game_context_draw_post();

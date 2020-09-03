@@ -24,6 +24,8 @@ typedef struct selector_t {
     Vector3 position_start;
     unsigned int state;
     unsigned int origin_piece;
+    Vector2 white_king_position;
+    unsigned int board_attacked_positions[8][8];
     Color color;
     bool visible;
 } selector_t;
@@ -57,6 +59,14 @@ void selector_process_keys(selector_t *selector)
     {
         selector->position.z += 1.0f;
     }
+}
+
+static bool selector_is_absolute_pin(selector_t selector){
+    return selector.board_attacked_positions[(int)selector.white_king_position.x][(int)selector.white_king_position.y];
+}
+
+static bool selector_is_position_under_attack(selector_t selector, Vector2 position){
+    return selector.board_attacked_positions[(int)position.y][(int)position.x];
 }
 
 void selector_pass_to_state_illegal(selector_t* selector){
@@ -122,15 +132,21 @@ void selector_draw(selector_t selector)
 
 bool selector_is_origin_position_legal(selector_t selector, unsigned int board[8][8]) {
     unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
-    return  piece > 6;
+    return  piece > 6 && !(selector_is_absolute_pin(selector) && piece != KNG_W);
 }
 
 bool selector_is_target_position_legal(selector_t selector, unsigned int board[8][8]) {
     if(selector.position_start.x == selector.position.x && selector.position_start.z == selector.position.z)
         return false;
 
-    unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
-    if(piece > 7)
+    unsigned int target_piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
+    unsigned int source_piece = board[(int)(selector.position_start.z)][(int)(selector.position_start.x)];
+    // TODO check for the target position, not the selector position
+    bool is_under_attack = selector_is_position_under_attack(selector, (Vector2){selector.position.x, selector.position.z});
+    if(source_piece == KNG_W && is_under_attack)
+        return false;
+    
+    if(target_piece > 7)
         return false;
 
     switch (selector.origin_piece)
@@ -176,7 +192,7 @@ void selector_process_state_ready(selector_t* selector, unsigned int board[8][8]
     }
 }
 
-void selector_update(selector_t* selector, unsigned int board[8][8])
+void selector_update(selector_t* selector, unsigned int board[8][8], unsigned int board_attacked_positions[8][8])
 {
     switch(selector->state){
         case SELECTOR_STATE_READY:

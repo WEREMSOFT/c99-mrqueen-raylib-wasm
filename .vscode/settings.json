@@ -4,5 +4,9 @@
         "array": "cpp",
         "string": "cpp",
         "string_view": "cpp"
-    }
+    },
+    "editor.quickSuggestionsDelay": 100000,
+    "files.autoSave": "afterDelay",
+    "C_Cpp.dimInactiveRegions": false,
+    "C_Cpp.autocomplete": "Disabled"
 }
