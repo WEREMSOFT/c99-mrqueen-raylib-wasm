@@ -10,6 +10,7 @@
 #include "selector.h"
 #define RLIGHTS_IMPLEMENTATION
 #include "rlights.h"
+#include "game_options.h"
 #include "gui_system.h"
 
 enum game_state_enum {
@@ -44,6 +45,7 @@ typedef struct game_context_t
     float piece_to_move_lerp_percentage;
     unsigned int piece_to_move;
     bool board_dirty;
+    game_options_t options;
 } game_context_t;
 
 char commands[COMMAND_COUNT][50] = {
@@ -343,7 +345,8 @@ void game_context_draw_pre() {
 
 static void game_context_build_scene(game_context_t* game_context){
     game_board_draw(game_context->board);
-    game_board_attaked_positions_draw(game_context->selector.board_attacked_positions);
+    if(game_context->options.draw_attacked_positions)
+        game_board_attaked_positions_draw(game_context->selector.board_attacked_positions);
     selector_draw(game_context->selector);
 }
 
@@ -369,8 +372,8 @@ void game_context_draw(game_context_t* game_context) {
     EndMode3D();
 }
 
-void game_context_draw_post() {
-    gui_draw();           
+void game_context_draw_post(game_context_t* game_context) {
+    gui_draw(&game_context->options);
     DrawFPS(900, 19);
     EndDrawing();
 }
@@ -400,7 +403,7 @@ void game_context_update(game_context_t* game_context)
             selector_update(&game_context->selector, game_context->board, game_context->selector.board_attacked_positions);
             game_context_draw_pre();
             game_context_draw(game_context);
-            game_context_draw_post();
+            game_context_draw_post(game_context);
             break;
         case GAME_STATE_WON_WHITE:
             game_context_draw_pre();
@@ -412,7 +415,7 @@ void game_context_update(game_context_t* game_context)
             DrawText("WHITE WINS", 255, HEIGHT/3 + 105, 70, BLACK);
             DrawText("WHITE WINS", 250, HEIGHT/3 + 100, 70, WHITE);
 
-            game_context_draw_post();
+            game_context_draw_post(game_context);
             break;
         case GAME_STATE_WON_BLACK:
             game_context_draw_pre();
@@ -424,7 +427,7 @@ void game_context_update(game_context_t* game_context)
             DrawText("BLACK WINS", 255, HEIGHT/3 + 105, 70, WHITE);
             DrawText("BLACK WINS", 250, HEIGHT/3 + 100, 70, BLACK);
 
-            game_context_draw_post();
+            game_context_draw_post(game_context);
             break;
         case GAME_STATE_ANIMATING:
             game_context->piece_to_move_lerp_percentage += 0.01;
@@ -571,7 +574,7 @@ void game_context_update(game_context_t* game_context)
                 game_board_pieces_draw(game_context->piece_to_move, game_context->piece_to_move_position_actual);
             }
             EndMode3D();
-            game_context_draw_post();
+            game_context_draw_post(game_context);
             break;
         case GAME_STATE_CASTLING_BLACK_LEFT:
             game_context->piece_to_move_lerp_percentage += 0.01;
@@ -606,7 +609,7 @@ void game_context_update(game_context_t* game_context)
                 game_board_pieces_draw(game_context->piece_to_move, game_context->piece_to_move_position_actual);
             }
             EndMode3D();
-            game_context_draw_post();
+            game_context_draw_post(game_context);
             break;
     }
 

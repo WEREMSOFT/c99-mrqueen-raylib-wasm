@@ -5,7 +5,7 @@
 #include <imconfig.h>
 #include <cimgui.h>
 #include "cimgui_impl_raylib.h"
-#include "game.h"
+#include "game_options.h"
 #include "game_board.h"
 
 ImDrawData *draw_data;
@@ -35,7 +35,7 @@ void gui_init(int screen_width, int screen_height){
     // At this point you've got the texture data and you need to upload that your your graphic system:
     // After we have created the texture, store its pointer/identifier (_in whichever format your engine uses_) in 'io.Fonts->TexID'.
     // This will be passed back to your via the renderer. Basically ImTextureID == void*. Read FAQ for details about ImTextureID.
-    image = LoadImageEx(pixels, width, height);
+    image = LoadImageEx((Color *)pixels, width, height);
     texture = LoadTextureFromImage(image); //MyEngine::CreateTextureFromMemoryPixels(pixels, width, height, TEXTURE_TYPE_RGBA32)
     io->Fonts->TexID = (void *)&texture.id;
 }
@@ -45,7 +45,7 @@ void gui_fini(){
     UnloadTexture(texture);
 }
 
-void gui_draw(){
+void gui_draw(game_options_t *game_options){
     if (igBeginMainMenuBar())
     {
         if (igBeginMenu("File", true))
@@ -58,6 +58,12 @@ void gui_draw(){
             if(igMenuItemBool("Quit", "CTRL+X", false, true)){
                 CloseWindow();
             };
+            igEndMenu();
+        }
+        if (igBeginMenu("Options", true)) {
+            if(igMenuItemBool("Show attacked positions", "", game_options->draw_attacked_positions, true)){
+                game_options->draw_attacked_positions = !game_options->draw_attacked_positions;
+            }
             igEndMenu();
         }
         if (igBeginMenu("Edit", true))
