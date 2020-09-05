@@ -9,7 +9,7 @@
 #define DEBUG_PRINT
 #include "console_output.h"
 #include "game_options.h"
-#include "game.h"
+#include "game_context.h"
 #include "game_board.h"
 #include "event.h"
 

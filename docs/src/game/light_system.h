@@ -1,6 +1,6 @@
 #ifndef __LIGHT_SYSTEM_H__
 #define __LIGHT_SYSTEM_H__
-#include "game.h"
+#include "game_context.h"
 
 #if defined(OS_WEB)
 #define GLSL_VERSION            100

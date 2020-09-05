@@ -1197,7 +1197,7 @@ struct ImGuiColorMod
 struct ImGuiStyleMod
 {
     ImGuiStyleVar VarIdx;
-    union { int BackupInt[2]; float BackupFloat[2]; };
+    union ImGuiStyleModU { int BackupInt[2]; float BackupFloat[2]; } __;
 };
 struct ImGuiGroupData
 {
@@ -1723,7 +1723,7 @@ struct ImGuiTextRange
 struct ImGuiStoragePair
 {
         ImGuiID key;
-        union { int val_i; float val_f; void* val_p; };
+        union ImGuiStoragePairU { int val_i; float val_f; void* val_p; } __;
 };
 #else
 struct GLFWwindow;

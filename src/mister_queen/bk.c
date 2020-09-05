@@ -409,7 +409,7 @@ int bk_test(int index, char *fen, char *bm) {
     do_search(&search, &board);
     char notation[16];
     notate_move(&board, &search.move, notation);
-    char padded[16];
+    char padded[20];
     sprintf(padded, " %s ", notation);
     int result = strstr(bm, padded) != NULL;
     simple_printf("%4d) %s: %8s [%s]\n",

@@ -34,7 +34,7 @@ void simple_printf(const char* fmt, ...)
         char coordinates[5] = {0};
         strncpy(coordinates, command, 4);
         event.type = EVENT_RESPONSE;
-        sprintf(event.data, coordinates);
+        sprintf(event.data, "%s", coordinates);
         event_queue_enqueue(event);
     }
 }

@@ -2,7 +2,7 @@
 #define __GAME_BOARD_H__
 #include <stdbool.h>
 #include <raygui.h>
-#include "game.h"
+#include "game_context.h"
 
 enum enum_pieces
 {
@@ -57,7 +57,7 @@ typedef struct game_board_matrix_coordinates_t {
 } game_board_matrix_coordinates_t;
 
 void game_board_reset(unsigned int board[8][8]){
-    memcpy(board, base_board, sizeof(board) * 64);
+    memcpy(board, base_board, sizeof(unsigned int) * 64);
 }
 
 game_board_matrix_coordinates_t game_board_get_coordinates_in_matrix(char *coords){

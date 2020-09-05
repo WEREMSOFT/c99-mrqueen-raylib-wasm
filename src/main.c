@@ -10,7 +10,7 @@
 
 #define WIDTH 1024
 #define HEIGHT 800
-#include "game/game.h"
+#include "game/game_context.h"
 
 #include "game/selector.h"
 #include "game/event.h"
@@ -39,7 +39,7 @@ int main(void)
     InitWindow(WIDTH, HEIGHT, "This is a chess game");
     SetTargetFPS(60);
     
-    game_context_t game_context = game_context_init();
+    game_context = game_context_init();
     command_history_init();
     selector_pass_to_state_ready(&game_context.selector);
     game_board_reset(game_context.board);
