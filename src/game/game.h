@@ -56,6 +56,48 @@ char commands[COMMAND_COUNT][50] = {
     "stop"
 };
 
+void calculate_diagonals_to_infinite(game_context_t* game_context, int i, int j) {
+    int pos_j = j;
+    int pos_i = i;
+    while(pos_j+1 < 8 && pos_i+1 < 8){
+        game_context->selector.board_attacked_positions[++pos_j][++pos_i] = true;
+        if(game_context->board[pos_j][pos_i] != EMPTY) break;
+    }
+    pos_j = j;
+    pos_i = i;
+    while(pos_j+1 < 8 && pos_i-1 >= 0){
+        game_context->selector.board_attacked_positions[++pos_j][--pos_i] = true;
+        if(game_context->board[pos_j][pos_i] != EMPTY) break;
+    }
+}
+
+void calculate_square_to_infinite(game_context_t* game_context, int i, int j) {
+    int pos_j = j;
+    int pos_i = i;
+    while(pos_j+1 < 8){
+        game_context->selector.board_attacked_positions[++pos_j][pos_i] = true;
+        if(game_context->board[pos_j][pos_i] != EMPTY) break;
+    }
+    pos_j = j;
+    pos_i = i;
+    while(pos_j-1 >= 0){
+        game_context->selector.board_attacked_positions[--pos_j][pos_i] = true;
+        if(game_context->board[pos_j][pos_i] != EMPTY) break;
+    }
+    pos_j = j;
+    pos_i = i;
+    while(pos_i+1 < 8){
+        game_context->selector.board_attacked_positions[pos_j][++pos_i] = true;
+        if(game_context->board[pos_j][pos_i] != EMPTY) break;
+    }
+    pos_j = j;
+    pos_i = i;
+    while(pos_i-1 >= 0){
+        game_context->selector.board_attacked_positions[pos_j][--pos_i] = true;
+        if(game_context->board[pos_j][pos_i] != EMPTY) break;
+    }
+}
+
 void game_board_calculate_attacked_positions(game_context_t* game_context){
     memset(game_context->selector.board_attacked_positions, 0x00, sizeof(unsigned int) * 64);
     for (int i = 0; i < 8; i++)
@@ -67,6 +109,10 @@ void game_board_calculate_attacked_positions(game_context_t* game_context){
                 case KNG_W:
                     game_context->selector.white_king_position.x = j;
                     game_context->selector.white_king_position.y = i;
+                    break;
+                case QEN_B:
+                    calculate_diagonals_to_infinite(game_context, i, j);
+                    calculate_square_to_infinite(game_context, i, j);
                     break;
                 case PWN_B:
                     if(j+1 < 8 && i+1 < 8){
@@ -104,48 +150,10 @@ void game_board_calculate_attacked_positions(game_context_t* game_context){
                     }
                     break;
                 case BSP_B:
-                    {
-                        int pos_j = j;
-                        int pos_i = i;
-                        while(pos_j+1 < 8 && pos_i+1 < 8){
-                            game_context->selector.board_attacked_positions[++pos_j][++pos_i] = true;
-                            if(game_context->board[pos_j][pos_i] != EMPTY) break;
-                        }
-                        pos_j = j;
-                        pos_i = i;
-                        while(pos_j+1 < 8 && pos_i-1 >= 0){
-                            game_context->selector.board_attacked_positions[++pos_j][--pos_i] = true;
-                            if(game_context->board[pos_j][pos_i] != EMPTY) break;
-                        }
-                    }
+                    calculate_diagonals_to_infinite(game_context, i, j);
                     break;
                 case TWR_B:
-                    {
-                        int pos_j = j;
-                        int pos_i = i;
-                        while(pos_j+1 < 8){
-                            game_context->selector.board_attacked_positions[++pos_j][pos_i] = true;
-                            if(game_context->board[pos_j][pos_i] != EMPTY) break;
-                        }
-                        pos_j = j;
-                        pos_i = i;
-                        while(pos_j-1 >= 0){
-                            game_context->selector.board_attacked_positions[--pos_j][pos_i] = true;
-                            if(game_context->board[pos_j][pos_i] != EMPTY) break;
-                        }
-                        pos_j = j;
-                        pos_i = i;
-                        while(pos_i+1 < 8){
-                            game_context->selector.board_attacked_positions[pos_j][++pos_i] = true;
-                            if(game_context->board[pos_j][pos_i] != EMPTY) break;
-                        }
-                        pos_j = j;
-                        pos_i = i;
-                        while(pos_i-1 >= 0){
-                            game_context->selector.board_attacked_positions[pos_j][--pos_i] = true;
-                            if(game_context->board[pos_j][pos_i] != EMPTY) break;
-                        }
-                    }
+                    calculate_square_to_infinite(game_context, i, j);
                     break;
             }
         }

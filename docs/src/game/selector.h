@@ -132,7 +132,8 @@ void selector_draw(selector_t selector)
 
 bool selector_is_origin_position_legal(selector_t selector, unsigned int board[8][8]) {
     unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
-    return  piece > 6 && !(selector_is_absolute_pin(selector) && piece != KNG_W);
+    return  piece > 6 
+            && !(selector_is_absolute_pin(selector) && piece != KNG_W) ;
 }
 
 bool selector_is_target_position_legal(selector_t selector, unsigned int board[8][8]) {
@@ -141,7 +142,7 @@ bool selector_is_target_position_legal(selector_t selector, unsigned int board[8
 
     unsigned int target_piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
     unsigned int source_piece = board[(int)(selector.position_start.z)][(int)(selector.position_start.x)];
-    // TODO check for the target position, not the selector position
+
     bool is_under_attack = selector_is_position_under_attack(selector, (Vector2){selector.position.x, selector.position.z});
     if(source_piece == KNG_W && is_under_attack)
         return false;
