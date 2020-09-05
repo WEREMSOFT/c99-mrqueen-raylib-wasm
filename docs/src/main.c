@@ -6,7 +6,7 @@
 #include "mister_queen/bb.h"
 #include "mister_queen/uci.h"
 #include "mister_queen/util.h"
-#include "game/types.h"
+#include "game/commands.h"
 
 #define WIDTH 1024
 #define HEIGHT 800

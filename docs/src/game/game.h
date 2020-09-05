@@ -3,7 +3,7 @@
 
 #include <raylib.h>
 #include <raymath.h>
-#include "types.h"
+#include "commands.h"
 #include "event.h"
 #include "command_history.h"
 #include "game_board.h"
@@ -45,7 +45,6 @@ typedef struct game_context_t
     float piece_to_move_lerp_percentage;
     unsigned int piece_to_move;
     bool board_dirty;
-    game_options_t options;
 } game_context_t;
 
 char commands[COMMAND_COUNT][50] = {
@@ -353,7 +352,7 @@ void game_context_draw_pre() {
 
 static void game_context_build_scene(game_context_t* game_context){
     game_board_draw(game_context->board);
-    if(game_context->options.draw_attacked_positions)
+    if(game_options.draw_attacked_positions)
         game_board_attaked_positions_draw(game_context->selector.board_attacked_positions);
     selector_draw(game_context->selector);
 }
@@ -381,7 +380,7 @@ void game_context_draw(game_context_t* game_context) {
 }
 
 void game_context_draw_post(game_context_t* game_context) {
-    gui_draw(&game_context->options);
+    gui_draw();
     DrawFPS(900, 19);
     EndDrawing();
 }

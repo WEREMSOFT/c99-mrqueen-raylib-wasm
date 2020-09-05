@@ -45,7 +45,7 @@ void gui_fini(){
     UnloadTexture(texture);
 }
 
-void gui_draw(game_options_t *game_options){
+void gui_draw(){
     if (igBeginMainMenuBar())
     {
         if (igBeginMenu("File", true))
@@ -61,11 +61,14 @@ void gui_draw(game_options_t *game_options){
             igEndMenu();
         }
         if (igBeginMenu("Options", true)) {
-            if(igMenuItemBool("Show attacked positions", "", game_options->draw_attacked_positions, true)){
-                game_options->draw_attacked_positions = !game_options->draw_attacked_positions;
+            if(igMenuItemBool("Show attacked positions", "", game_options.draw_attacked_positions, true)){
+                game_options.draw_attacked_positions = !game_options.draw_attacked_positions;
             }
-            if(igMenuItemBool("Allow move is king is pinned", "", game_options->allow_move_if_king_is_pinned, true)){
-                game_options->allow_move_if_king_is_pinned = !game_options->allow_move_if_king_is_pinned;
+            if(igMenuItemBool("Allow move is king is pinned", "", game_options.allow_move_if_king_is_pinned, true)){
+                game_options.allow_move_if_king_is_pinned = !game_options.allow_move_if_king_is_pinned;
+            }
+            if(igMenuItemBool("Allow move is king if target is under attack", "", game_options.allow_move_king_if_target_is_under_attack, true)){
+                game_options.allow_move_king_if_target_is_under_attack = !game_options.allow_move_king_if_target_is_under_attack;
             }
             igEndMenu();
         }

@@ -1,5 +1,5 @@
-#ifndef __TYPES_H__
-#define __TYPES_H__
+#ifndef __COMMANDS_H__
+#define __COMMANDS_H__
 
 enum enum_commands {
     UCI,

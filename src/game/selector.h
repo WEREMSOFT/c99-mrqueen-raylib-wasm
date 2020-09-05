@@ -5,9 +5,10 @@
 #include <string.h>
 #include <stdbool.h>
 #include "../mister_queen/uci.h"
-#include "types.h"
+#include "commands.h"
 #define DEBUG_PRINT
 #include "console_output.h"
+#include "game_options.h"
 #include "game.h"
 #include "game_board.h"
 #include "event.h"
@@ -133,7 +134,9 @@ void selector_draw(selector_t selector)
 bool selector_is_origin_position_legal(selector_t selector, unsigned int board[8][8]) {
     unsigned int piece = board[(int)(selector.position.z)][(int)(selector.position.x)];
     return  piece > 6 
-            && !(selector_is_absolute_pin(selector) && piece != KNG_W) ;
+            && !(!game_options.allow_move_if_king_is_pinned 
+                && selector_is_absolute_pin(selector) 
+                && piece != KNG_W);
 }
 
 bool selector_is_target_position_legal(selector_t selector, unsigned int board[8][8]) {
@@ -144,7 +147,7 @@ bool selector_is_target_position_legal(selector_t selector, unsigned int board[8
     unsigned int source_piece = board[(int)(selector.position_start.z)][(int)(selector.position_start.x)];
 
     bool is_under_attack = selector_is_position_under_attack(selector, (Vector2){selector.position.x, selector.position.z});
-    if(source_piece == KNG_W && is_under_attack)
+    if(game_options.allow_move_king_if_target_is_under_attack && source_piece == KNG_W && is_under_attack)
         return false;
     
     if(target_piece > 7)
