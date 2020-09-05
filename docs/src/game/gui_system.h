@@ -4,6 +4,8 @@
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include <imconfig.h>
 #include <cimgui.h>
+#define MSF_GIF_IMPL
+#include <msf_gif.h>
 #include "cimgui_impl_raylib.h"
 #include "game_options.h"
 #include "game_board.h"
@@ -55,12 +57,25 @@ void gui_draw(){
                 event.type = EVENT_UI_NEW_GAME;
                 event_queue_enqueue(event);
             };
-            if(igMenuItemBool("Quit", "CTRL+X", false, true)){
+            if(igMenuItemBool("Take Screenshot", "", false, true)){
+                Image img = GetScreenData();
+                int centisecondsPerFrame = 5, bitDepth = 15;
+                MsfGifState gifState = { 0 };
+                msf_gif_begin(&gifState, "example.gif", img.width, img.height);
+                msf_gif_frame(&gifState, img.data, bitDepth, centisecondsPerFrame, img.width * 4, false); //frame 1
+                msf_gif_end(&gifState);
+            };
+
+            if(igMenuItemBool("Quit", "Esc", false, true)){
                 CloseWindow();
             };
             igEndMenu();
         }
         if (igBeginMenu("Options", true)) {
+            if(igMenuItemBool("FullScreen", "", game_options.is_full_creen, true)){
+                game_options.is_full_creen = !game_options.is_full_creen;
+                ToggleFullscreen();
+            }
             if(igMenuItemBool("Show attacked positions", "", game_options.draw_attacked_positions, true)){
                 game_options.draw_attacked_positions = !game_options.draw_attacked_positions;
             }
@@ -70,16 +85,6 @@ void gui_draw(){
             if(igMenuItemBool("Allow move is king if target is under attack", "", game_options.allow_move_king_if_target_is_under_attack, true)){
                 game_options.allow_move_king_if_target_is_under_attack = !game_options.allow_move_king_if_target_is_under_attack;
             }
-            igEndMenu();
-        }
-        if (igBeginMenu("Edit", true))
-        {
-            if (igMenuItemBool("Undo", "CTRL+Z", false, true)) {}
-            if (igMenuItemBool("Redo", "CTRL+Y", false, true)) {}  // Disabled item
-            igSeparator();
-            if (igMenuItemBool("Cut", "CTRL+X", false, true)) {}
-            if (igMenuItemBool("Copy", "CTRL+C", false, true)) {}
-            if (igMenuItemBool("Paste", "CTRL+V", false, true)) {}
             igEndMenu();
         }
         igEndMainMenuBar();

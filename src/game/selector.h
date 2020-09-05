@@ -4,13 +4,8 @@
 #include <raylib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "../mister_queen/uci.h"
 #include "commands.h"
-#define DEBUG_PRINT
-#include "console_output.h"
 #include "game_options.h"
-#include "game_context.h"
-#include "game_board.h"
 #include "event.h"
 
 enum enum_selector_state {

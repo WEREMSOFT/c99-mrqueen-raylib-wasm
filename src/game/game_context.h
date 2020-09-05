@@ -387,6 +387,16 @@ void game_context_draw_post() {
     EndDrawing();
 }
 
+void minimap_draw() {
+    BeginMode3D(game_context.camera_top);
+    {
+        game_board_draw(game_context.board);
+        game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
+    }
+    EndMode3D();
+    DrawText("SARASA", 900, 19, 20, RED);
+}
+
 void game_context_update()
 {
     game_context_event_process();
@@ -470,13 +480,7 @@ void game_context_update()
             }
             EndMode3D();
 
-            BeginMode3D(game_context.camera_top);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
-                selector_draw(game_context.selector);
-            }
-            EndMode3D();
+            minimap_draw();
             game_context_draw_post();
             break;
 
@@ -507,12 +511,7 @@ void game_context_update()
             }
             EndMode3D();
 
-            BeginMode3D(game_context.camera_top);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
-            }
-            EndMode3D();
+            minimap_draw();
             game_context_draw_post();
             break;
         case GAME_STATE_CASTLING_BLACK_RIGHT:
@@ -528,6 +527,7 @@ void game_context_update()
                     game_board_set_piece_at_source(game_context.board, "h8xx", EMPTY);
 
                     game_context.state = GAME_STATE_PLAYING;
+                    game_context.selector.state = SELECTOR_STATE_READY;
             }
             game_context_draw_pre();
 
@@ -542,12 +542,7 @@ void game_context_update()
             }
             EndMode3D();
 
-            BeginMode3D(game_context.camera_top);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
-            }
-            EndMode3D();
+            minimap_draw();
             game_context_draw_post();
             break;
         case GAME_STATE_CASTLING_WHITE_LEFT:
@@ -577,12 +572,7 @@ void game_context_update()
             }
             EndMode3D();
 
-            BeginMode3D(game_context.camera_top);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
-            }
-            EndMode3D();
+            minimap_draw();
             game_context_draw_post();
             break;
         case GAME_STATE_CASTLING_BLACK_LEFT:
@@ -598,6 +588,7 @@ void game_context_update()
                     game_board_set_piece_at_source(game_context.board, "a8xx", EMPTY);
 
                     game_context.state = GAME_STATE_PLAYING;
+                    game_context.selector.state = SELECTOR_STATE_READY;
             }
             game_context_draw_pre();
 
@@ -612,12 +603,7 @@ void game_context_update()
             }
             EndMode3D();
 
-            BeginMode3D(game_context.camera_top);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
-            }
-            EndMode3D();
+            minimap_draw();
             game_context_draw_post();
             break;
     }
