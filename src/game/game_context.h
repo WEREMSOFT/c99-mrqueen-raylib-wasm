@@ -3,6 +3,10 @@
 
 #include <raylib.h>
 #include <raymath.h>
+
+#define MSF_GIF_IMPL
+#include <msf_gif.h>
+
 #include "commands.h"
 #include "event.h"
 #include "command_history.h"
@@ -45,6 +49,8 @@ typedef struct game_context_t
     float piece_to_move_lerp_percentage;
     unsigned int piece_to_move;
     bool board_dirty;
+    MsfGifState gif_state;
+    Image image_data;
 } game_context_t;
 
 game_context_t game_context = {0};
@@ -188,6 +194,8 @@ static Camera3D camera_top_init()
 game_context_t game_context_init(){
     game_context_t game_context = {0};
 
+    msf_gif_begin(&game_context.gif_state, "match_recording.gif", WIDTH, HEIGHT);
+
     game_context.background = LoadTexture("assets/background.png");
     game_context.background.width = WIDTH;
     game_context.background.height = HEIGHT;
@@ -196,6 +204,12 @@ game_context_t game_context_init(){
     game_context.camera_perspective = camera_perspective_init();
 
     return game_context;
+}
+
+void game_context_fini() {
+    msf_gif_end(&game_context.gif_state);
+    UnloadTexture(game_context.background);
+    UnloadImage(game_context.image_data);
 }
 
 void game_context_pass_to_state_animating(char* position){
@@ -373,12 +387,6 @@ void game_context_draw() {
         game_context_build_scene();
     }
     EndMode3D();
-
-    BeginMode3D(game_context.camera_top);
-    {
-        game_context_build_scene();
-    }
-    EndMode3D();
 }
 
 void game_context_draw_post() {
@@ -394,7 +402,23 @@ void minimap_draw() {
         game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
     }
     EndMode3D();
-    DrawText("SARASA", 900, 19, 20, RED);
+    DrawText("a b c d e f g h", 865, 180, 19, RED);
+    int offset = 18;
+    DrawText("8", 845, 36, 19, RED);
+    DrawText("7", 845, 36 + offset * 1, 20, RED);
+    DrawText("6", 845, 36 + offset * 2, 20, RED);
+    DrawText("5", 845, 36 + offset * 3, 20, RED);
+    DrawText("4", 845, 36 + offset * 4, 20, RED);
+    DrawText("3", 845, 36 + offset * 5, 20, RED);
+    DrawText("2", 845, 36 + offset * 6, 20, RED);
+    DrawText("1", 845, 36 + offset * 7, 20, RED);
+}
+
+void record_frame(){
+    game_context.image_data = GetScreenData();
+    int centisecondsPerFrame = 5, bitDepth = 15;
+
+    msf_gif_frame(&game_context.gif_state, game_context.image_data.data, bitDepth, centisecondsPerFrame, game_context.image_data.width * 4, false); //frame 1
 }
 
 void game_context_update()
@@ -422,6 +446,7 @@ void game_context_update()
             selector_update(&game_context.selector, game_context.board, game_context.selector.board_attacked_positions);
             game_context_draw_pre();
             game_context_draw();
+            minimap_draw();
             game_context_draw_post();
             break;
         case GAME_STATE_WON_WHITE:
@@ -449,6 +474,7 @@ void game_context_update()
             game_context_draw_post();
             break;
         case GAME_STATE_ANIMATING:
+
             game_context.piece_to_move_lerp_percentage += 0.01;
             game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
             if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
@@ -483,7 +509,6 @@ void game_context_update()
             minimap_draw();
             game_context_draw_post();
             break;
-
         case GAME_STATE_CASTLING_WHITE_RIGHT:
             game_context.piece_to_move_lerp_percentage += 0.01;
             game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
@@ -519,7 +544,6 @@ void game_context_update()
             game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
             game_context.piece_castling_position_actual = Vector3Lerp(game_context.piece_castling_position_actual, game_context.piece_castlint_position_target, game_context.piece_to_move_lerp_percentage);
             if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
-                    
                     game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
                     game_board_set_piece_at_target(game_context.board, "xxg8", KNG_B);
                     game_board_set_piece_at_source(game_context.board, "e8xx", EMPTY);

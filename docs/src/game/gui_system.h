@@ -4,8 +4,6 @@
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include <imconfig.h>
 #include <cimgui.h>
-#define MSF_GIF_IMPL
-#include <msf_gif.h>
 #include "cimgui_impl_raylib.h"
 #include "game_options.h"
 #include "game_board.h"
@@ -58,12 +56,7 @@ void gui_draw(){
                 event_queue_enqueue(event);
             };
             if(igMenuItemBool("Take Screenshot", "", false, true)){
-                Image img = GetScreenData();
-                int centisecondsPerFrame = 5, bitDepth = 15;
-                MsfGifState gifState = { 0 };
-                msf_gif_begin(&gifState, "example.gif", img.width, img.height);
-                msf_gif_frame(&gifState, img.data, bitDepth, centisecondsPerFrame, img.width * 4, false); //frame 1
-                msf_gif_end(&gifState);
+                TakeScreenshot("the_only_screenshot.png");
             };
 
             if(igMenuItemBool("Quit", "Esc", false, true)){

@@ -263,7 +263,7 @@ Module.expectedDataFileDownloads++;
    "audio": 0
   } ],
   "remote_package_size": 7309716,
-  "package_uuid": "16ce2122-8616-4ea9-b569-d3d0e780c386"
+  "package_uuid": "5ce30489-fad8-4a35-990b-990de5eb5d9e"
  });
 })();
 
@@ -1314,7 +1314,7 @@ function updateGlobalBufferAndViews(buf) {
  Module["HEAPF64"] = HEAPF64 = new Float64Array(buf);
 }
 
-var STATIC_BASE = 1024, STACK_BASE = 31532880, STACKTOP = STACK_BASE, STACK_MAX = 2629e4, DYNAMIC_BASE = 31532880, DYNAMICTOP_PTR = 26289072;
+var STATIC_BASE = 1024, STACK_BASE = 31532704, STACKTOP = STACK_BASE, STACK_MAX = 26289824, DYNAMIC_BASE = 31532704, DYNAMICTOP_PTR = 26288896;
 
 assert(STACK_BASE % 16 === 0, "stack must start aligned");
 
@@ -1808,10 +1808,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 210091: function() {
+ 209867: function() {
   throw "Canceled!";
  },
- 210339: function($0, $1) {
+ 210115: function($0, $1) {
   setTimeout(function() {
    _do_emscripten_dispatch_to_thread($0, $1);
   }, 0);
@@ -1991,7 +1991,7 @@ var ERRNO_CODES = {
  ESTRPIPE: 135
 };
 
-var __main_thread_futex_wait_address = 26289984;
+var __main_thread_futex_wait_address = 26289808;
 
 function _emscripten_futex_wake(addr, count) {
  if (addr <= 0 || addr > GROWABLE_HEAP_I8().length || addr & 3 != 0 || count < 0) return -28;
@@ -2063,12 +2063,12 @@ var PThread = {
   for (var i = 0; i < pthreadPoolSize; ++i) {
    PThread.allocateUnusedWorker();
   }
-  PThread.mainThreadBlock = 26289232;
+  PThread.mainThreadBlock = 26289056;
   for (var i = 0; i < 232 / 4; ++i) GROWABLE_HEAP_U32()[PThread.mainThreadBlock / 4 + i] = 0;
   GROWABLE_HEAP_I32()[PThread.mainThreadBlock + 12 >> 2] = PThread.mainThreadBlock;
   var headPtr = PThread.mainThreadBlock + 156;
   GROWABLE_HEAP_I32()[headPtr >> 2] = headPtr;
-  var tlsMemory = 26289472;
+  var tlsMemory = 26289296;
   for (var i = 0; i < 128; ++i) GROWABLE_HEAP_U32()[tlsMemory / 4 + i] = 0;
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 104 >> 2, tlsMemory);
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 40 >> 2, PThread.mainThreadBlock);
@@ -6208,7 +6208,7 @@ function _emscripten_get_pointerlock_status(pointerlockStatus) {
 }
 
 function _emscripten_get_sbrk_ptr() {
- return 26289072;
+ return 26288896;
 }
 
 function __webgl_enable_ANGLE_instanced_arrays(ctx) {
@@ -10727,9 +10727,9 @@ var asm = createWasm();
 
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__wasm_call_ctors");
 
-var _free = Module["_free"] = createExportWrapper("free");
-
 var _malloc = Module["_malloc"] = createExportWrapper("malloc");
+
+var _free = Module["_free"] = createExportWrapper("free");
 
 var _main = Module["_main"] = createExportWrapper("main");
 

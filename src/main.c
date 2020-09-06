@@ -64,7 +64,8 @@ int main(void)
     gui_fini();
     command_history_fini();
     game_board_models_unload();
-    UnloadTexture(game_context.background);
+
+    game_context_fini();
     CloseWindow();
     return 0;
 }
