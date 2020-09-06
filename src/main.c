@@ -1,3 +1,5 @@
+#define MSF_GIF_IMPL
+
 #include <time.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -43,6 +45,7 @@ int main(void)
     
     game_context = game_context_init();
     recording_system_init();
+
     command_history_init();
     selector_pass_to_state_ready(&game_context.selector);
     game_board_reset(game_context.board);

@@ -70,7 +70,7 @@ void selector_pass_to_state_illegal(selector_t* selector){
         selector->position_start = selector->position;
 }
 
-void selector_send_move_to_engine(selector_t selector)
+void selector_send_move_to_engine(const selector_t selector)
 {
     char coordinates[5] = {0};
     selector_get_coordinates_as_string(selector, coordinates);

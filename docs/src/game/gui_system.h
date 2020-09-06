@@ -59,8 +59,8 @@ void gui_draw(){
             if(igMenuItemBool("Take Screenshot", "", false, true)){
                 TakeScreenshot("the_only_screenshot.png");
             };
-            if(igMenuItemBool(recording_system.state == RECORDING_SYSTEM_STATE_READY ? "Start Recording" : "Stop Recording", "", false, true)){
-                switch(recording_system.state){
+            if(igMenuItemBool(recording_system_is_ready() ? "Start Recording" : "Stop Recording", "", false, true)){
+                switch(recording_system_state()){
                     case RECORDING_SYSTEM_STATE_READY:
                         recording_system_start_recording();
                         break;
