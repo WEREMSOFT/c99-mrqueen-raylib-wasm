@@ -12,6 +12,7 @@
 #include "rlights.h"
 #include "game_options.h"
 #include "gui_system.h"
+#include "recording_system.h"
 
 enum game_state_enum {
     GAME_STATE_PLAYING,
@@ -504,6 +505,7 @@ void game_context_update()
 
             minimap_draw();
             game_context_draw_post();
+            recording_system_update();
             break;
         case GAME_STATE_CASTLING_WHITE_RIGHT:
             game_context.piece_to_move_lerp_percentage += 0.01;
@@ -534,6 +536,7 @@ void game_context_update()
 
             minimap_draw();
             game_context_draw_post();
+            recording_system_update();
             break;
         case GAME_STATE_CASTLING_BLACK_RIGHT:
             game_context.piece_to_move_lerp_percentage += 0.01;
@@ -564,6 +567,7 @@ void game_context_update()
 
             minimap_draw();
             game_context_draw_post();
+            recording_system_update();
             break;
         case GAME_STATE_CASTLING_WHITE_LEFT:
             game_context.piece_to_move_lerp_percentage += 0.01;
@@ -594,6 +598,7 @@ void game_context_update()
 
             minimap_draw();
             game_context_draw_post();
+            recording_system_update();
             break;
         case GAME_STATE_CASTLING_BLACK_LEFT:
             game_context.piece_to_move_lerp_percentage += 0.01;
@@ -625,6 +630,7 @@ void game_context_update()
 
             minimap_draw();
             game_context_draw_post();
+            recording_system_update();
             break;
     }
 

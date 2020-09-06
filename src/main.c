@@ -19,6 +19,8 @@
 #include "game/gui_system.h"
 #include "game/light_system.h"
 
+#include "game/recording_system.h"
+
 #include <raylib.h>
 
 #ifdef OS_WEB
@@ -40,6 +42,7 @@ int main(void)
     SetTargetFPS(60);
     
     game_context = game_context_init();
+    recording_system_init();
     command_history_init();
     selector_pass_to_state_ready(&game_context.selector);
     game_board_reset(game_context.board);
@@ -64,8 +67,8 @@ int main(void)
     gui_fini();
     command_history_fini();
     game_board_models_unload();
-
     game_context_fini();
+    recording_system_fini();
     CloseWindow();
     return 0;
 }

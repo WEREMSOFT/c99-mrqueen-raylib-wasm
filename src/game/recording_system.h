@@ -26,7 +26,7 @@ recording_system_t recording_system = {0};
 
 void recording_system_init(){
     recording_system.centiseconds_per_frame = 5;
-    recording_system.bit_depth = 15;
+    recording_system.bit_depth = 24;
 }
 
 
@@ -42,7 +42,7 @@ void recording_system_start_recording(){
         return;
 
     unsigned int const FILENAME_LENGTH = 100;
-    char file_name[FILENAME_LENGTH] = {0};
+    char file_name[FILENAME_LENGTH];
 
     {
         time_t t = time(NULL);
@@ -67,13 +67,17 @@ void recording_system_update(){
             double elapsed_time = ((double)clock() - recording_system.base_time) / CLOCKS_PER_SEC;
 
             if(elapsed_time >= (double)recording_system.centiseconds_per_frame / 100){
+                recording_system.img = GetScreenData();
                 recording_system.base_time = clock();
                 msf_gif_frame(&recording_system.gif_state, (uint8_t *)recording_system.img.data, recording_system.bit_depth, recording_system.centiseconds_per_frame, recording_system.img.width * 4, false);
             }
         }
         break;
     }
+}
 
+void recording_system_fini(){
+    recording_system_stop_recording();
 }
 
 #endif

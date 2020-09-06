@@ -7,6 +7,7 @@
 #include "cimgui_impl_raylib.h"
 #include "game_options.h"
 #include "game_board.h"
+#include "recording_system.h"
 
 ImDrawData *draw_data;
 Image image = {0};
@@ -58,8 +59,15 @@ void gui_draw(){
             if(igMenuItemBool("Take Screenshot", "", false, true)){
                 TakeScreenshot("the_only_screenshot.png");
             };
-            if(igMenuItemBool("Start Recording", "", false, true)){
-                
+            if(igMenuItemBool(recording_system.state == RECORDING_SYSTEM_STATE_READY ? "Start Recording" : "Stop Recording", "", false, true)){
+                switch(recording_system.state){
+                    case RECORDING_SYSTEM_STATE_READY:
+                        recording_system_start_recording();
+                        break;
+                    case RECORDING_SYSTEM_STATE_RECORDING:
+                        recording_system_stop_recording();
+                        break;
+                }
             };
             if(igMenuItemBool("Quit", "Esc", false, true)){
                 CloseWindow();
