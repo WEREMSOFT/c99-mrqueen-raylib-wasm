@@ -244,6 +244,7 @@ bool ImGui_ImplRaylib_ProcessEvent()
     int keyPressed = GetKeyPressed();
     if (keyPressed > 0)
     {
+        printf("processing key event %d\n", keyPressed);
         ImGuiIO_AddInputCharacter(io, keyPressed);
     }
  

@@ -58,7 +58,9 @@ void gui_draw(){
             if(igMenuItemBool("Take Screenshot", "", false, true)){
                 TakeScreenshot("the_only_screenshot.png");
             };
-
+            if(igMenuItemBool("Start Recording", "", false, true)){
+                
+            };
             if(igMenuItemBool("Quit", "Esc", false, true)){
                 CloseWindow();
             };

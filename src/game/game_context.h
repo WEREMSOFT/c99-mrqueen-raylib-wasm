@@ -3,10 +3,6 @@
 
 #include <raylib.h>
 #include <raymath.h>
-
-#define MSF_GIF_IMPL
-#include <msf_gif.h>
-
 #include "commands.h"
 #include "event.h"
 #include "command_history.h"
