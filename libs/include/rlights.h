@@ -69,11 +69,6 @@ extern "C" {            // Prevents name mangling of functions
 #endif
 
 //----------------------------------------------------------------------------------
-// Global Variables Definition
-//----------------------------------------------------------------------------------
-int lightsCount = 0;    // Current amount of created lights
-
-//----------------------------------------------------------------------------------
 // Module Functions Declaration
 //----------------------------------------------------------------------------------
 Light CreateLight(int type, Vector3 position, Vector3 target, Color color, Shader shader);   // Create a light and get shader locations
@@ -94,6 +89,11 @@ void UpdateLightValues(Shader shader, Light light);         // Send light proper
 ************************************************************************************/
 
 #if defined(RLIGHTS_IMPLEMENTATION)
+
+//----------------------------------------------------------------------------------
+// Global Variables Definition
+//----------------------------------------------------------------------------------
+int lightsCount = 0;    // Current amount of created lights
 
 #include "raylib.h"
 

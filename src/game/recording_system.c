@@ -10,6 +10,7 @@ void recording_system_init(){
 
 void recording_system_stop_recording(){
     if(recording_system.state == RECORDING_SYSTEM_STATE_RECORDING){
+        recording_system_add_frame();
         msf_gif_end(&recording_system.gif_state);
     }
     recording_system.state = RECORDING_SYSTEM_STATE_READY;
@@ -31,11 +32,16 @@ void recording_system_start_recording(){
         tm.tm_mday, 
         tm.tm_hour, tm.tm_min, tm.tm_sec);
     }
-    
     recording_system.img = GetScreenData();
     msf_gif_begin(&recording_system.gif_state, file_name, recording_system.img.width, recording_system.img.height);
+    recording_system_add_frame();
     recording_system.base_time = clock();
     recording_system.state = RECORDING_SYSTEM_STATE_RECORDING;
+}
+
+void recording_system_add_frame() {
+    recording_system.img = GetScreenData();
+    msf_gif_frame(&recording_system.gif_state, (uint8_t *)recording_system.img.data, recording_system.bit_depth, recording_system.centiseconds_per_frame, recording_system.img.width * 4, false);
 }
 
 void recording_system_update(){
@@ -45,9 +51,8 @@ void recording_system_update(){
             double elapsed_time = ((double)clock() - recording_system.base_time) / CLOCKS_PER_SEC;
 
             if(elapsed_time >= (double)recording_system.centiseconds_per_frame / 100){
-                recording_system.img = GetScreenData();
                 recording_system.base_time = clock();
-                msf_gif_frame(&recording_system.gif_state, (uint8_t *)recording_system.img.data, recording_system.bit_depth, recording_system.centiseconds_per_frame, recording_system.img.width * 4, false);
+                recording_system_add_frame();
             }
         }
         break;

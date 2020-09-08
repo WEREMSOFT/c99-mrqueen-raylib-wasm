@@ -21,6 +21,7 @@ typedef struct recording_system_t {
     MsfGifState gif_state;
 } recording_system_t;
 
+void recording_system_add_frame();
 void recording_system_init();
 void recording_system_stop_recording();
 void recording_system_start_recording();
