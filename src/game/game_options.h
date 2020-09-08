@@ -7,6 +7,7 @@ typedef struct game_options_t {
     bool allow_move_king_if_target_is_under_attack;
     bool is_full_creen;
     bool should_close_window;
+    bool show_coordinates_on_minimap;
 } game_options_t;
 
 #endif

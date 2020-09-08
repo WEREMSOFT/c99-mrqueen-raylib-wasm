@@ -399,16 +399,18 @@ void minimap_draw() {
         game_board_pieces_draw(game_context.piece_to_move, game_context.piece_to_move_position_actual);
     }
     EndMode3D();
-    DrawText("a b c d e f g h", 865, 180, 19, RED);
-    int offset = 18;
-    DrawText("8", 845, 36, 19, RED);
-    DrawText("7", 845, 36 + offset * 1, 20, RED);
-    DrawText("6", 845, 36 + offset * 2, 20, RED);
-    DrawText("5", 845, 36 + offset * 3, 20, RED);
-    DrawText("4", 845, 36 + offset * 4, 20, RED);
-    DrawText("3", 845, 36 + offset * 5, 20, RED);
-    DrawText("2", 845, 36 + offset * 6, 20, RED);
-    DrawText("1", 845, 36 + offset * 7, 20, RED);
+    if(game_options.show_coordinates_on_minimap) {
+        DrawText("a b c d e f g h", 865, 180, 19, RED);
+        int offset = 18;
+        DrawText("8", 845, 36, 19, RED);
+        DrawText("7", 845, 36 + offset * 1, 20, RED);
+        DrawText("6", 845, 36 + offset * 2, 20, RED);
+        DrawText("5", 845, 36 + offset * 3, 20, RED);
+        DrawText("4", 845, 36 + offset * 4, 20, RED);
+        DrawText("3", 845, 36 + offset * 5, 20, RED);
+        DrawText("2", 845, 36 + offset * 6, 20, RED);
+        DrawText("1", 845, 36 + offset * 7, 20, RED);
+    }
 }
 
 void record_frame(){
@@ -457,6 +459,18 @@ void process_state_animating(){
     recording_system_update();
 }
 
+void update_lerp(){
+    game_context.piece_to_move_lerp_percentage += 0.01;
+    game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
+    game_context.piece_castling_position_actual = Vector3Lerp(game_context.piece_castling_position_actual, game_context.piece_castlint_position_target, game_context.piece_to_move_lerp_percentage);
+}
+
+void finish_animation_cycle(){
+    minimap_draw();
+    game_context_draw_post();
+    recording_system_update();
+}
+
 void game_context_update()
 {
     game_context_event_process();
@@ -497,9 +511,7 @@ void game_context_update()
             process_state_animating();
             break;
         case GAME_STATE_CASTLING_WHITE_RIGHT:
-            game_context.piece_to_move_lerp_percentage += 0.01;
-            game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
-            game_context.piece_castling_position_actual = Vector3Lerp(game_context.piece_castling_position_actual, game_context.piece_castlint_position_target, game_context.piece_to_move_lerp_percentage);
+            update_lerp();
             if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
                     
                     game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
@@ -523,14 +535,10 @@ void game_context_update()
             }
             EndMode3D();
 
-            minimap_draw();
-            game_context_draw_post();
-            recording_system_update();
+            finish_animation_cycle();
             break;
         case GAME_STATE_CASTLING_BLACK_RIGHT:
-            game_context.piece_to_move_lerp_percentage += 0.01;
-            game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
-            game_context.piece_castling_position_actual = Vector3Lerp(game_context.piece_castling_position_actual, game_context.piece_castlint_position_target, game_context.piece_to_move_lerp_percentage);
+            update_lerp();
             if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
                     game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
                     game_board_set_piece_at_target(game_context.board, "xxg8", KNG_B);
@@ -554,14 +562,10 @@ void game_context_update()
             }
             EndMode3D();
 
-            minimap_draw();
-            game_context_draw_post();
-            recording_system_update();
+            finish_animation_cycle();
             break;
         case GAME_STATE_CASTLING_WHITE_LEFT:
-            game_context.piece_to_move_lerp_percentage += 0.01;
-            game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
-            game_context.piece_castling_position_actual = Vector3Lerp(game_context.piece_castling_position_actual, game_context.piece_castlint_position_target, game_context.piece_to_move_lerp_percentage);
+            update_lerp();
             if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
                     
                     game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
@@ -585,14 +589,10 @@ void game_context_update()
             }
             EndMode3D();
 
-            minimap_draw();
-            game_context_draw_post();
-            recording_system_update();
+            finish_animation_cycle();
             break;
         case GAME_STATE_CASTLING_BLACK_LEFT:
-            game_context.piece_to_move_lerp_percentage += 0.01;
-            game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
-            game_context.piece_castling_position_actual = Vector3Lerp(game_context.piece_castling_position_actual, game_context.piece_castlint_position_target, game_context.piece_to_move_lerp_percentage);
+            update_lerp();
             if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
                     
                     game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
@@ -616,10 +616,7 @@ void game_context_update()
                 game_board_pieces_draw(TWR_B, game_context.piece_castling_position_actual);
             }
             EndMode3D();
-
-            minimap_draw();
-            game_context_draw_post();
-            recording_system_update();
+            finish_animation_cycle();
             break;
     }
 }

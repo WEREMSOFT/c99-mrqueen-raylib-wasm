@@ -52,6 +52,7 @@ void recording_system_update(){
 
             if(elapsed_time >= (double)recording_system.centiseconds_per_frame / 100){
                 recording_system.base_time = clock();
+                printf("adding frame...\n");
                 recording_system_add_frame();
             }
         }

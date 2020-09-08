@@ -7,9 +7,11 @@
 #include "event.h"
 #include "recording_system.h"
 #include "game_options.h"
+#include "commands.h"
+#include "../mister_queen/uci.h"
 
 extern game_options_t game_options;
-
+extern char commands[COMMAND_COUNT][50];
 ImDrawData *draw_data;
 Image image = {0};
 Texture2D texture = {0};
@@ -80,6 +82,9 @@ void gui_draw(){
                 game_options.is_full_creen = !game_options.is_full_creen;
                 ToggleFullscreen();
             }
+            if(igMenuItemBool("Show coordinates on minimap", "", game_options.show_coordinates_on_minimap, true)){
+                game_options.show_coordinates_on_minimap = !game_options.show_coordinates_on_minimap;
+            }
             if(igMenuItemBool("Show attacked positions", "", game_options.draw_attacked_positions, true)){
                 game_options.draw_attacked_positions = !game_options.draw_attacked_positions;
             }
@@ -88,6 +93,9 @@ void gui_draw(){
             }
             if(igMenuItemBool("Allow move is king if target is under attack", "", game_options.allow_move_king_if_target_is_under_attack, true)){
                 game_options.allow_move_king_if_target_is_under_attack = !game_options.allow_move_king_if_target_is_under_attack;
+            }
+            if(igMenuItemBool("Force computer to move", "", NULL, true)){
+                parse_line(commands[GO]);
             }
             igEndMenu();
         }

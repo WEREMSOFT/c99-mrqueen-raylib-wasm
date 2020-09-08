@@ -263,7 +263,7 @@ Module.expectedDataFileDownloads++;
    "audio": 0
   } ],
   "remote_package_size": 7309716,
-  "package_uuid": "d51a4eda-6f59-4903-9734-62a8f5f81d08"
+  "package_uuid": "fbc52ec2-4245-4570-86b5-78d68a6cd5a3"
  });
 })();
 
@@ -1314,7 +1314,7 @@ function updateGlobalBufferAndViews(buf) {
  Module["HEAPF64"] = HEAPF64 = new Float64Array(buf);
 }
 
-var STATIC_BASE = 1024, STACK_BASE = 31533296, STACKTOP = STACK_BASE, STACK_MAX = 26290416, DYNAMIC_BASE = 31533296, DYNAMICTOP_PTR = 26289488;
+var STATIC_BASE = 1024, STACK_BASE = 31533360, STACKTOP = STACK_BASE, STACK_MAX = 26290480, DYNAMIC_BASE = 31533360, DYNAMICTOP_PTR = 26289552;
 
 assert(STACK_BASE % 16 === 0, "stack must start aligned");
 
@@ -1808,10 +1808,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 210363: function() {
+ 210427: function() {
   throw "Canceled!";
  },
- 210611: function($0, $1) {
+ 210675: function($0, $1) {
   setTimeout(function() {
    _do_emscripten_dispatch_to_thread($0, $1);
   }, 0);
@@ -1991,7 +1991,7 @@ var ERRNO_CODES = {
  ESTRPIPE: 135
 };
 
-var __main_thread_futex_wait_address = 26290400;
+var __main_thread_futex_wait_address = 26290464;
 
 function _emscripten_futex_wake(addr, count) {
  if (addr <= 0 || addr > GROWABLE_HEAP_I8().length || addr & 3 != 0 || count < 0) return -28;
@@ -2063,12 +2063,12 @@ var PThread = {
   for (var i = 0; i < pthreadPoolSize; ++i) {
    PThread.allocateUnusedWorker();
   }
-  PThread.mainThreadBlock = 26289648;
+  PThread.mainThreadBlock = 26289712;
   for (var i = 0; i < 232 / 4; ++i) GROWABLE_HEAP_U32()[PThread.mainThreadBlock / 4 + i] = 0;
   GROWABLE_HEAP_I32()[PThread.mainThreadBlock + 12 >> 2] = PThread.mainThreadBlock;
   var headPtr = PThread.mainThreadBlock + 156;
   GROWABLE_HEAP_I32()[headPtr >> 2] = headPtr;
-  var tlsMemory = 26289888;
+  var tlsMemory = 26289952;
   for (var i = 0; i < 128; ++i) GROWABLE_HEAP_U32()[tlsMemory / 4 + i] = 0;
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 104 >> 2, tlsMemory);
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 40 >> 2, PThread.mainThreadBlock);
@@ -6208,7 +6208,7 @@ function _emscripten_get_pointerlock_status(pointerlockStatus) {
 }
 
 function _emscripten_get_sbrk_ptr() {
- return 26289488;
+ return 26289552;
 }
 
 function __webgl_enable_ANGLE_instanced_arrays(ctx) {
@@ -10012,9 +10012,9 @@ function _glfwWindowHint(target, hint) {
  GLFW.hints[target] = hint;
 }
 
-var ___tm_current = 26289504;
+var ___tm_current = 26289568;
 
-var ___tm_timezone = (stringToUTF8("GMT", 26289552, 4), 26289552);
+var ___tm_timezone = (stringToUTF8("GMT", 26289616, 4), 26289616);
 
 function _tzset() {
  if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(28, 1);
