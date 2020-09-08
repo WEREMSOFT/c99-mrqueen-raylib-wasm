@@ -2,12 +2,7 @@
 #define __SELECTOR_H__
 
 #include <raylib.h>
-#include <string.h>
 #include <stdbool.h>
-#include "commands.h"
-#include "game_options.h"
-#include "event.h"
-#include "game_board.h"
 
 enum enum_selector_state {
     SELECTOR_STATE_DISABLED,

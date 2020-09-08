@@ -1,8 +1,5 @@
 #include "selector.h"
 #include <raylib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "commands.h"
 #include "game_options.h"
 #include "event.h"
 #include "game_board.h"

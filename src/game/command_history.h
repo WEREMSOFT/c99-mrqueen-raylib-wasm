@@ -2,8 +2,6 @@
 #define __COMMAND_HISTORY_H__
 #define COMMAND_HISTORY_SIZE 2000
 
-#include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 
 void command_history_init();

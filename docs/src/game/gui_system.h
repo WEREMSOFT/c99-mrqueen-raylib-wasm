@@ -1,7 +1,6 @@
 #ifndef __GUI_SYSTEM_H__
 #define __GUI_SYSTEM_H__
 
-#include "cimgui_impl_raylib.h"
 #include "game_options.h"
 #include "game_board.h"
 #include "recording_system.h"

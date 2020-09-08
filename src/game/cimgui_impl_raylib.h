@@ -2,10 +2,8 @@
 #define CIMGUI_RAYLIB_H
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
-#include <imconfig.h>
 #include <cimgui.h>
 #include <float.h>
-#include <raylib.h>
 #include <rlgl.h>
 
 bool ImGui_ImplRaylib_Init();

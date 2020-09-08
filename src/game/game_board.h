@@ -1,7 +1,6 @@
 #ifndef __GAME_BOARD_H__
 #define __GAME_BOARD_H__
 #include <raygui.h>
-#include <string.h>
 
 enum enum_pieces
 {
