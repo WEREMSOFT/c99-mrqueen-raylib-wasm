@@ -174,6 +174,7 @@ void raylib_render_draw_triangles(unsigned int count, const ImDrawIdx *idx_buffe
 
 void raylib_render_cimgui(ImDrawData *draw_data)
 {
+    rlDisableBackfaceCulling();
     for (int n = 0; n < draw_data->CmdListsCount; n++)
     {
         const ImDrawList *cmd_list = draw_data->CmdLists[n];
@@ -203,4 +204,5 @@ void raylib_render_cimgui(ImDrawData *draw_data)
         }
     }
     EndScissorMode();
+    rlEnableBackfaceCulling();
 }
