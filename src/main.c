@@ -16,6 +16,12 @@
 extern game_context_t game_context;
 game_options_t game_options = {0};
 
+#ifdef OS_WEB
+void web_main_loop(void){
+    game_context.update();
+}
+#endif
+
 int main(void)
 {
 #ifdef OS_Windows_NT
@@ -45,11 +51,11 @@ int main(void)
     uci_board_reset();
     
 #ifdef OS_WEB
-    emscripten_set_main_loop_arg(game_context_update, &game_context, 0, 1);
+    emscripten_set_main_loop(web_main_loop, 0, 1);
 #else
     while (!WindowShouldClose() && !game_options.should_close_window)
     {
-        game_context_update(&game_context);
+        game_context.update();
     }
 #endif
     gui_fini();

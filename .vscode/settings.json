@@ -5,8 +5,9 @@
         "string": "cpp",
         "string_view": "cpp"
     },
-    "editor.quickSuggestionsDelay": 100000,
+    "editor.quickSuggestionsDelay": 3,
     "files.autoSave": "afterDelay",
     "C_Cpp.dimInactiveRegions": false,
-    "C_Cpp.autocomplete": "Disabled"
+    "C_Cpp.default.intelliSenseMode": "gcc-x64",
+    "editor.tabCompletion": "on"
 }

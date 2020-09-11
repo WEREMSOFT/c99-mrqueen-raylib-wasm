@@ -169,7 +169,7 @@ void game_board_models_load(Shader shader){
     models[MODEL_KNIGHT].materials[0].shader = shader;
 }
 
-void game_board_models_unload(){
+void game_board_models_unload(void){
     for(int i = 0; i < MODEL_COUNT; i++){
         UnloadModel(models[i]);
     }

@@ -26,11 +26,11 @@ typedef struct event_queue_t {
     event_t events[EVENT_QUEUE_SIZE];
 } event_queue_t;
 
-void event_queue_init();
-bool event_queue_is_empty();
-bool event_queue_is_full();
+void event_queue_init(void);
+bool event_queue_is_empty(void);
+bool event_queue_is_full(void);
 int event_queue_enqueue(event_t event);
-event_t event_queue_dequeue();
+event_t event_queue_dequeue(void);
 
 #undef EVENT_QUEUE_SIZE
 

@@ -6,7 +6,7 @@
 
 #define CONSOLE_BUFFER_SIZE 1000000
 
-char* console_buffer_get();
+char* console_buffer_get(void);
 void simple_printf(const char* fmt, ...);
 
 #endif

@@ -22,6 +22,23 @@ char commands[COMMAND_COUNT][50] = {
     "stop"
 };
 
+static void update_lerp(void);
+static void finish_animation_cycle(void);
+static void process_state_castling_black_left(void);
+static void process_state_castling_white_right(void);
+static void process_state_castling_white_left(void);
+static void process_state_won_black(void);
+static void process_state_animating(void);
+
+static void process_state_playing(void){
+    game_context_event_process();
+    selector_update(&game_context.selector, game_context.board, game_context.selector.board_attacked_positions);
+    game_context_draw_pre();
+    game_context_draw();
+    minimap_draw();
+    game_context_draw_post();
+}
+
 void calculate_diagonals_to_infinite(int i, int j) {
     int pos_j = j;
     int pos_i = i;
@@ -76,7 +93,7 @@ void calculate_square_to_infinite(int i, int j) {
     }
 }
 
-void game_board_calculate_attacked_positions(){
+void game_board_calculate_attacked_positions(void){
     memset(game_context.selector.board_attacked_positions, 0x00, sizeof(unsigned int) * 64);
     for (int i = 0; i < 8; i++)
     {
@@ -186,7 +203,7 @@ void lights_init(game_context_t* game_state){
     UpdateLightValues(game_state->shader, game_state->light3);
 }
 
-game_context_t game_context_init(){
+game_context_t game_context_init(void){
     game_context_t game_context = {0};
 
     msf_gif_begin(&game_context.gif_state, "match_recording.gif", WIDTH, HEIGHT);
@@ -200,17 +217,19 @@ game_context_t game_context_init(){
 
     lights_init(&game_context);
 
+    game_context.update = &process_state_playing;
+
     return game_context;
 }
 
-void game_context_fini() {
+void game_context_fini(void) {
     msf_gif_end(&game_context.gif_state);
     UnloadTexture(game_context.background);
     UnloadImage(game_context.image_data);
 }
 
 void game_context_pass_to_state_animating(char* position){
-    game_context.state = GAME_STATE_ANIMATING;
+    game_context.update = &process_state_animating;
     game_context.piece_to_move_lerp_percentage = 0;
     game_context.piece_to_move = game_board_get_piece_at_source(game_context.board, position);
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world(position);
@@ -219,8 +238,37 @@ void game_context_pass_to_state_animating(char* position){
     strncpy(game_context.target_position, position, 5);
 }
 
-void game_context_pass_to_state_castling_black_right(){
-    game_context.state = GAME_STATE_CASTLING_BLACK_RIGHT;
+static void process_state_castling_black_right(void){
+    game_context_event_process();
+    update_lerp();
+    if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
+            game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
+            game_board_set_piece_at_target(game_context.board, "xxg8", KNG_B);
+            game_board_set_piece_at_source(game_context.board, "e8xx", EMPTY);
+            game_board_set_piece_at_target(game_context.board, "xxf8", TWR_B);
+            game_board_set_piece_at_source(game_context.board, "h8xx", EMPTY);
+
+            game_context.update = &process_state_playing;
+            game_context.selector.state = SELECTOR_STATE_READY;
+    }
+    game_context_draw_pre();
+
+    ClearBackground(LIGHTGRAY);
+    DrawTexture(game_context.background, 0, 0, WHITE);
+
+    BeginMode3D(game_context.camera_perspective);
+    {
+        game_board_draw(game_context.board);
+        game_board_pieces_draw(KNG_B, game_context.piece_to_move_position_actual);
+        game_board_pieces_draw(TWR_B, game_context.piece_castling_position_actual);
+    }
+    EndMode3D();
+    finish_animation_cycle();
+}
+
+void game_context_pass_to_state_castling_black_right(void){
+    game_context.update = &process_state_castling_black_right;
+    
     game_context.piece_to_move_lerp_percentage = 0;
 
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world("e8xx");
@@ -233,8 +281,8 @@ void game_context_pass_to_state_castling_black_right(){
     game_board_set_piece_at_source(game_context.board, "h8xx", PIECE_IN_MOTION);
 }
 
-void game_context_pass_to_state_castling_black_left(){
-    game_context.state = GAME_STATE_CASTLING_BLACK_LEFT;
+void game_context_pass_to_state_castling_black_left(void){
+    game_context.update = &process_state_castling_black_left;
     game_context.piece_to_move_lerp_percentage = 0;
 
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world("e8xx");
@@ -247,8 +295,8 @@ void game_context_pass_to_state_castling_black_left(){
     game_board_set_piece_at_source(game_context.board, "a8xx", PIECE_IN_MOTION);
 }
 
-void game_context_pass_to_state_castling_white_right(){
-    game_context.state = GAME_STATE_CASTLING_WHITE_RIGHT;
+void game_context_pass_to_state_castling_white_right(void){
+    game_context.update = &process_state_castling_white_right;
     game_context.piece_to_move_lerp_percentage = 0;
 
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world("e1xx");
@@ -261,8 +309,8 @@ void game_context_pass_to_state_castling_white_right(){
     game_board_set_piece_at_source(game_context.board, "h1xx", PIECE_IN_MOTION);
 }
 
-void game_context_pass_to_state_castling_white_left(){
-    game_context.state = GAME_STATE_CASTLING_WHITE_LEFT;
+void game_context_pass_to_state_castling_white_left(void){
+    game_context.update = &process_state_castling_white_left;
     game_context.piece_to_move_lerp_percentage = 0;
 
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world("e1xx");
@@ -275,7 +323,7 @@ void game_context_pass_to_state_castling_white_left(){
     game_board_set_piece_at_source(game_context.board, "a1xx", PIECE_IN_MOTION);
 }
 
-void game_context_event_process(){
+void game_context_event_process(void){
     event_t event = {0};
     while((event = event_queue_dequeue()).type)
     {
@@ -287,8 +335,8 @@ void game_context_event_process(){
                 parse_line((char *)&commands[ISREADY]);
                 game_board_reset(game_context.board);
                 char *history_buffer = command_history_get_buffer();
+                game_context.update = &process_state_playing;
                 memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
-                game_context.state = GAME_STATE_PLAYING;
                 selector_pass_to_state_ready(&game_context.selector);
                 event_queue_init();
                 game_context.board_dirty = true;
@@ -309,7 +357,7 @@ void game_context_event_process(){
                     ){
                     game_context_pass_to_state_castling_black_left();
                 } else {
-                    if(game_context.state == GAME_STATE_ANIMATING || game_context.state == GAME_STATE_PLAYING){
+                    if(game_context.update == &process_state_animating || game_context.update == &process_state_playing){
                         game_context_pass_to_state_animating(event.data);
                         command_history_add_command(" ");
                         command_history_add_command(event.data);
@@ -363,7 +411,7 @@ void game_context_draw_pre() {
     ui_pre_frame_update();
 }
 
-static void game_context_build_scene(){
+static void game_context_build_scene(void){
     game_board_draw(game_context.board);
     if(game_options.draw_attacked_positions)
         game_board_attaked_positions_draw(game_context.selector.board_attacked_positions);
@@ -413,14 +461,28 @@ void minimap_draw() {
     }
 }
 
-void record_frame(){
+void record_frame(void){
     game_context.image_data = GetScreenData();
     int centisecondsPerFrame = 5, bitDepth = 15;
 
     msf_gif_frame(&game_context.gif_state, game_context.image_data.data, bitDepth, centisecondsPerFrame, game_context.image_data.width * 4, false); //frame 1
 }
 
-void process_state_animating(){
+static void process_state_won_white(void){
+    game_context_event_process();
+    game_context_draw_pre();
+    game_context_draw();
+
+    DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
+    DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
+
+    DrawText("WHITE WINS", 255, HEIGHT/3 + 105, 70, BLACK);
+    DrawText("WHITE WINS", 250, HEIGHT/3 + 100, 70, WHITE);
+
+    game_context_draw_post();
+}
+
+static void process_state_animating(void){
     game_context.piece_to_move_lerp_percentage += 0.01;
     game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
     if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
@@ -429,15 +491,15 @@ void process_state_animating(){
             game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
             game_board_set_piece_at_target(game_context.board, game_context.target_position, game_context.piece_to_move);
             game_board_set_piece_at_source(game_context.board, game_context.target_position, EMPTY);
-            game_context.state = GAME_STATE_PLAYING;
+            game_context.update = &process_state_playing;
 
 
             if(piece == KNG_B){
-                game_context.state = GAME_STATE_WON_WHITE;
+                game_context.update = &process_state_won_white;
                 recording_system_stop_recording();
             }
             if(piece == KNG_W){
-                game_context.state = GAME_STATE_WON_BLACK;
+                game_context.update = &process_state_won_black;
                 recording_system_stop_recording();
             }
     }
@@ -459,164 +521,115 @@ void process_state_animating(){
     recording_system_update();
 }
 
-void update_lerp(){
+static void update_lerp(void){
     game_context.piece_to_move_lerp_percentage += 0.01;
     game_context.piece_to_move_position_actual = Vector3Lerp(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target, game_context.piece_to_move_lerp_percentage);
     game_context.piece_castling_position_actual = Vector3Lerp(game_context.piece_castling_position_actual, game_context.piece_castlint_position_target, game_context.piece_to_move_lerp_percentage);
 }
 
-void finish_animation_cycle(){
+static void finish_animation_cycle(void){
     minimap_draw();
     game_context_draw_post();
     recording_system_update();
 }
 
-void game_context_update()
-{
+static void process_state_won_black(void){
     game_context_event_process();
-    
-    switch (game_context.state){
-        case GAME_STATE_PLAYING:
-            selector_update(&game_context.selector, game_context.board, game_context.selector.board_attacked_positions);
-            game_context_draw_pre();
-            game_context_draw();
-            minimap_draw();
-            game_context_draw_post();
-            break;
-        case GAME_STATE_WON_WHITE:
-            game_context_draw_pre();
-            game_context_draw();
+    game_context_draw_pre();
+    game_context_draw();
 
-            DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
-            DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
+    DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
+    DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
 
-            DrawText("WHITE WINS", 255, HEIGHT/3 + 105, 70, BLACK);
-            DrawText("WHITE WINS", 250, HEIGHT/3 + 100, 70, WHITE);
+    DrawText("BLACK WINS", 255, HEIGHT/3 + 105, 70, WHITE);
+    DrawText("BLACK WINS", 250, HEIGHT/3 + 100, 70, BLACK);
 
-            game_context_draw_post();
-            break;
-        case GAME_STATE_WON_BLACK:
-            game_context_draw_pre();
-            game_context_draw();
+    game_context_draw_post();
+}
 
-            DrawText("CHECK MATE!", 155, HEIGHT/3 + 5, 100, BLACK);
-            DrawText("CHECK MATE!", 150, HEIGHT/3, 100, RED);
+static void process_state_castling_white_right(void){
+    game_context_event_process();
+    update_lerp();
+    if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
             
-            DrawText("BLACK WINS", 255, HEIGHT/3 + 105, 70, WHITE);
-            DrawText("BLACK WINS", 250, HEIGHT/3 + 100, 70, BLACK);
+            game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
+            game_board_set_piece_at_target(game_context.board, "xxg1", KNG_W);
+            game_board_set_piece_at_source(game_context.board, "e1xx", EMPTY);
+            game_board_set_piece_at_target(game_context.board, "xxf1", TWR_W);
+            game_board_set_piece_at_source(game_context.board, "h1xx", EMPTY);
 
-            game_context_draw_post();
-            break;
-        case GAME_STATE_ANIMATING:
-            process_state_animating();
-            break;
-        case GAME_STATE_CASTLING_WHITE_RIGHT:
-            update_lerp();
-            if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
-                    
-                    game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
-                    game_board_set_piece_at_target(game_context.board, "xxg1", KNG_W);
-                    game_board_set_piece_at_source(game_context.board, "e1xx", EMPTY);
-                    game_board_set_piece_at_target(game_context.board, "xxf1", TWR_W);
-                    game_board_set_piece_at_source(game_context.board, "h1xx", EMPTY);
-
-                    game_context.state = GAME_STATE_PLAYING;
-            }
-            game_context_draw_pre();
-
-            ClearBackground(LIGHTGRAY);
-            DrawTexture(game_context.background, 0, 0, WHITE);
-            
-            BeginMode3D(game_context.camera_perspective);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(KNG_W, game_context.piece_to_move_position_actual);
-                game_board_pieces_draw(TWR_W, game_context.piece_castling_position_actual);
-            }
-            EndMode3D();
-
-            finish_animation_cycle();
-            break;
-        case GAME_STATE_CASTLING_BLACK_RIGHT:
-            update_lerp();
-            if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
-                    game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
-                    game_board_set_piece_at_target(game_context.board, "xxg8", KNG_B);
-                    game_board_set_piece_at_source(game_context.board, "e8xx", EMPTY);
-                    game_board_set_piece_at_target(game_context.board, "xxf8", TWR_B);
-                    game_board_set_piece_at_source(game_context.board, "h8xx", EMPTY);
-
-                    game_context.state = GAME_STATE_PLAYING;
-                    game_context.selector.state = SELECTOR_STATE_READY;
-            }
-            game_context_draw_pre();
-
-            ClearBackground(LIGHTGRAY);
-            DrawTexture(game_context.background, 0, 0, WHITE);
-            
-            BeginMode3D(game_context.camera_perspective);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(KNG_B, game_context.piece_to_move_position_actual);
-                game_board_pieces_draw(TWR_B, game_context.piece_castling_position_actual);
-            }
-            EndMode3D();
-
-            finish_animation_cycle();
-            break;
-        case GAME_STATE_CASTLING_WHITE_LEFT:
-            update_lerp();
-            if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
-                    
-                    game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
-                    game_board_set_piece_at_target(game_context.board, "xxc1", KNG_W);
-                    game_board_set_piece_at_source(game_context.board, "e1xx", EMPTY);
-                    game_board_set_piece_at_target(game_context.board, "xxd1", TWR_W);
-                    game_board_set_piece_at_source(game_context.board, "a1xx", EMPTY);
-
-                    game_context.state = GAME_STATE_PLAYING;
-            }
-            game_context_draw_pre();
-
-            ClearBackground(LIGHTGRAY);
-            DrawTexture(game_context.background, 0, 0, WHITE);
-            
-            BeginMode3D(game_context.camera_perspective);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(KNG_W, game_context.piece_to_move_position_actual);
-                game_board_pieces_draw(TWR_W, game_context.piece_castling_position_actual);
-            }
-            EndMode3D();
-
-            finish_animation_cycle();
-            break;
-        case GAME_STATE_CASTLING_BLACK_LEFT:
-            update_lerp();
-            if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
-                    
-                    game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
-                    game_board_set_piece_at_target(game_context.board, "xxc8", KNG_B);
-                    game_board_set_piece_at_source(game_context.board, "e8xx", EMPTY);
-                    game_board_set_piece_at_target(game_context.board, "xxd8", TWR_B);
-                    game_board_set_piece_at_source(game_context.board, "a8xx", EMPTY);
-
-                    game_context.state = GAME_STATE_PLAYING;
-                    game_context.selector.state = SELECTOR_STATE_READY;
-            }
-            game_context_draw_pre();
-
-            ClearBackground(LIGHTGRAY);
-            DrawTexture(game_context.background, 0, 0, WHITE);
-            
-            BeginMode3D(game_context.camera_perspective);
-            {
-                game_board_draw(game_context.board);
-                game_board_pieces_draw(KNG_B, game_context.piece_to_move_position_actual);
-                game_board_pieces_draw(TWR_B, game_context.piece_castling_position_actual);
-            }
-            EndMode3D();
-            finish_animation_cycle();
-            break;
+            game_context.update = process_state_playing;
     }
+    game_context_draw_pre();
+
+    ClearBackground(LIGHTGRAY);
+    DrawTexture(game_context.background, 0, 0, WHITE);
+    
+    BeginMode3D(game_context.camera_perspective);
+    {
+        game_board_draw(game_context.board);
+        game_board_pieces_draw(KNG_W, game_context.piece_to_move_position_actual);
+        game_board_pieces_draw(TWR_W, game_context.piece_castling_position_actual);
+    }
+    EndMode3D();
+
+    finish_animation_cycle();
+}
+
+static void process_state_castling_white_left(void){
+    game_context_event_process();
+    update_lerp();
+    if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
+            
+            game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
+            game_board_set_piece_at_target(game_context.board, "xxc1", KNG_W);
+            game_board_set_piece_at_source(game_context.board, "e1xx", EMPTY);
+            game_board_set_piece_at_target(game_context.board, "xxd1", TWR_W);
+            game_board_set_piece_at_source(game_context.board, "a1xx", EMPTY);
+
+            game_context.update = &process_state_playing;
+    }
+    game_context_draw_pre();
+
+    ClearBackground(LIGHTGRAY);
+    DrawTexture(game_context.background, 0, 0, WHITE);
+
+    BeginMode3D(game_context.camera_perspective);
+    {
+        game_board_draw(game_context.board);
+        game_board_pieces_draw(KNG_W, game_context.piece_to_move_position_actual);
+        game_board_pieces_draw(TWR_W, game_context.piece_castling_position_actual);
+    }
+    EndMode3D();
+
+    finish_animation_cycle();
+}
+
+static void process_state_castling_black_left(void){
+    game_context_event_process();
+    update_lerp();
+    if(Vector3Distance(game_context.piece_to_move_position_actual, game_context.piece_to_move_position_target) < 0.1){
+            
+            game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
+            game_board_set_piece_at_target(game_context.board, "xxc8", KNG_B);
+            game_board_set_piece_at_source(game_context.board, "e8xx", EMPTY);
+            game_board_set_piece_at_target(game_context.board, "xxd8", TWR_B);
+            game_board_set_piece_at_source(game_context.board, "a8xx", EMPTY);
+
+            game_context.update = &process_state_playing;
+            game_context.selector.state = SELECTOR_STATE_READY;
+    }
+    game_context_draw_pre();
+
+    ClearBackground(LIGHTGRAY);
+    DrawTexture(game_context.background, 0, 0, WHITE);
+
+    BeginMode3D(game_context.camera_perspective);
+    {
+        game_board_draw(game_context.board);
+        game_board_pieces_draw(KNG_B, game_context.piece_to_move_position_actual);
+        game_board_pieces_draw(TWR_B, game_context.piece_castling_position_actual);
+    }
+    EndMode3D();
+    finish_animation_cycle();
 }

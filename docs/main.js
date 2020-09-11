@@ -263,7 +263,7 @@ Module.expectedDataFileDownloads++;
    "audio": 0
   } ],
   "remote_package_size": 7309716,
-  "package_uuid": "fbc52ec2-4245-4570-86b5-78d68a6cd5a3"
+  "package_uuid": "8204abe1-60de-496a-b6b7-f63e5b615cdf"
  });
 })();
 
@@ -917,8 +917,8 @@ function getValue(ptr, type, noSafe) {
 var wasmMemory;
 
 var wasmTable = new WebAssembly.Table({
- "initial": 220,
- "maximum": 220 + 0,
+ "initial": 228,
+ "maximum": 228 + 0,
  "element": "anyfunc"
 });
 
@@ -8152,10 +8152,6 @@ function _emscripten_set_keydown_callback_on_thread(target, userData, useCapture
  return 0;
 }
 
-function _emscripten_set_main_loop_arg(func, arg, fps, simulateInfiniteLoop) {
- _emscripten_set_main_loop(func, fps, simulateInfiniteLoop, arg);
-}
-
 function __registerTouchEventCallback(target, userData, useCapture, callbackfunc, eventTypeId, eventTypeString, targetThread) {
  targetThread = JSEvents.getTargetThreadForEventCallback(targetThread);
  if (!JSEvents.touchEvent) JSEvents.touchEvent = _malloc(1684);
@@ -10668,7 +10664,7 @@ var asmLibraryArg = {
  "emscripten_set_gamepadconnected_callback_on_thread": _emscripten_set_gamepadconnected_callback_on_thread,
  "emscripten_set_gamepaddisconnected_callback_on_thread": _emscripten_set_gamepaddisconnected_callback_on_thread,
  "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread,
- "emscripten_set_main_loop_arg": _emscripten_set_main_loop_arg,
+ "emscripten_set_main_loop": _emscripten_set_main_loop,
  "emscripten_set_touchcancel_callback_on_thread": _emscripten_set_touchcancel_callback_on_thread,
  "emscripten_set_touchend_callback_on_thread": _emscripten_set_touchend_callback_on_thread,
  "emscripten_set_touchmove_callback_on_thread": _emscripten_set_touchmove_callback_on_thread,

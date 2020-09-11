@@ -8,7 +8,7 @@ static char* command_history = NULL;
 
 static unsigned int command_hostory_size_multiplier = 1;
 
-void command_history_init(){
+void command_history_init(void){
    command_history = (char *)calloc(COMMAND_HISTORY_SIZE, sizeof(char));
    assert(command_history != NULL && "Error initializing memory");
 }
@@ -25,10 +25,10 @@ void command_history_add_command(char* command){
     strcat(command_history, command);
 }
 
-char* command_history_get_buffer(){
+char* command_history_get_buffer(void){
     return command_history;
 }
 
-void command_history_fini(){
+void command_history_fini(void){
     free(command_history);
 }

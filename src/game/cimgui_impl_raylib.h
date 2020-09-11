@@ -6,9 +6,9 @@
 #include <float.h>
 #include <rlgl.h>
 
-bool ImGui_ImplRaylib_Init();
-void ImGui_ImplRaylib_Shutdown();
-void ImGui_ImplRaylib_NewFrame();
+bool ImGui_ImplRaylib_Init(void);
+void ImGui_ImplRaylib_Shutdown(void);
+void ImGui_ImplRaylib_NewFrame(void);
 
 #define FOR_ALL_KEYS(X) \
     X(KEY_APOSTROPHE); \
@@ -120,7 +120,7 @@ void ImGui_ImplRaylib_NewFrame();
 
 #define SET_KEY_DOWN(KEY) io->KeysDown[KEY] = IsKeyDown(KEY)
 
-bool ImGui_ImplRaylib_ProcessEvent();
+bool ImGui_ImplRaylib_ProcessEvent(void);
 void draw_triangle_vertex(ImDrawVert idx_vert);
 void raylib_render_draw_triangles(unsigned int count, const ImDrawIdx *idx_buffer, const ImDrawVert *idx_vert, unsigned int texture_id);
 void raylib_render_cimgui(ImDrawData *draw_data);

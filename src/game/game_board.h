@@ -50,7 +50,7 @@ void game_board_set_piece_at_target(unsigned int board[8][8], char *coords, unsi
 void game_board_move_piece(unsigned int board[8][8], char *coords);
 void game_board_pieces_draw(int piece, Vector3 position);
 void game_board_models_load(Shader shader);
-void game_board_models_unload();
+void game_board_models_unload(void);
 void game_board_draw(unsigned int board[8][8]);
 void game_board_attaked_positions_draw(unsigned int board[8][8]);
 

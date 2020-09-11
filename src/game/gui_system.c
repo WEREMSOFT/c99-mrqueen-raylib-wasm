@@ -44,12 +44,12 @@ void gui_init(int screen_width, int screen_height){
     io->Fonts->TexID = (void *)&texture.id;
 }
 
-void gui_fini(){
+void gui_fini(void){
     UnloadImage(image);
     UnloadTexture(texture);
 }
 
-void gui_draw(){
+void gui_draw(void){
     if (igBeginMainMenuBar())
     {
         if (igBeginMenu("File", true))
@@ -107,7 +107,7 @@ void gui_draw(){
     raylib_render_cimgui(draw_data);
 }
 
-void ui_pre_frame_update(){
+void ui_pre_frame_update(void){
     ImGui_ImplRaylib_NewFrame();
     ImGui_ImplRaylib_ProcessEvent();
     igNewFrame();
