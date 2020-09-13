@@ -263,7 +263,7 @@ Module.expectedDataFileDownloads++;
    "audio": 0
   } ],
   "remote_package_size": 7309716,
-  "package_uuid": "f87d7b95-1ba0-4ae0-af62-9a030f72d7ea"
+  "package_uuid": "48ca5b8a-7f4b-4ee0-8eb5-a8497838bf22"
  });
 })();
 
@@ -1314,7 +1314,7 @@ function updateGlobalBufferAndViews(buf) {
  Module["HEAPF64"] = HEAPF64 = new Float64Array(buf);
 }
 
-var STATIC_BASE = 1024, STACK_BASE = 31533360, STACKTOP = STACK_BASE, STACK_MAX = 26290480, DYNAMIC_BASE = 31533360, DYNAMICTOP_PTR = 26289552;
+var STATIC_BASE = 1024, STACK_BASE = 31533344, STACKTOP = STACK_BASE, STACK_MAX = 26290464, DYNAMIC_BASE = 31533344, DYNAMICTOP_PTR = 26289536;
 
 assert(STACK_BASE % 16 === 0, "stack must start aligned");
 
@@ -1991,7 +1991,7 @@ var ERRNO_CODES = {
  ESTRPIPE: 135
 };
 
-var __main_thread_futex_wait_address = 26290464;
+var __main_thread_futex_wait_address = 26290448;
 
 function _emscripten_futex_wake(addr, count) {
  if (addr <= 0 || addr > GROWABLE_HEAP_I8().length || addr & 3 != 0 || count < 0) return -28;
@@ -2063,12 +2063,12 @@ var PThread = {
   for (var i = 0; i < pthreadPoolSize; ++i) {
    PThread.allocateUnusedWorker();
   }
-  PThread.mainThreadBlock = 26289712;
+  PThread.mainThreadBlock = 26289696;
   for (var i = 0; i < 232 / 4; ++i) GROWABLE_HEAP_U32()[PThread.mainThreadBlock / 4 + i] = 0;
   GROWABLE_HEAP_I32()[PThread.mainThreadBlock + 12 >> 2] = PThread.mainThreadBlock;
   var headPtr = PThread.mainThreadBlock + 156;
   GROWABLE_HEAP_I32()[headPtr >> 2] = headPtr;
-  var tlsMemory = 26289952;
+  var tlsMemory = 26289936;
   for (var i = 0; i < 128; ++i) GROWABLE_HEAP_U32()[tlsMemory / 4 + i] = 0;
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 104 >> 2, tlsMemory);
   Atomics.store(GROWABLE_HEAP_U32(), PThread.mainThreadBlock + 40 >> 2, PThread.mainThreadBlock);
@@ -6208,7 +6208,7 @@ function _emscripten_get_pointerlock_status(pointerlockStatus) {
 }
 
 function _emscripten_get_sbrk_ptr() {
- return 26289552;
+ return 26289536;
 }
 
 function __webgl_enable_ANGLE_instanced_arrays(ctx) {
@@ -10008,9 +10008,9 @@ function _glfwWindowHint(target, hint) {
  GLFW.hints[target] = hint;
 }
 
-var ___tm_current = 26289568;
+var ___tm_current = 26289552;
 
-var ___tm_timezone = (stringToUTF8("GMT", 26289616, 4), 26289616);
+var ___tm_timezone = (stringToUTF8("GMT", 26289600, 4), 26289600);
 
 function _tzset() {
  if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(28, 1);

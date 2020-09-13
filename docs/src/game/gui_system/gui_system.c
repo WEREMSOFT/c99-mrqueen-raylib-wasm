@@ -2,13 +2,14 @@
 #define __GUI_SYSTEM_H__
 
 #include "gui_system.h"
-#include "cimgui_impl_raylib.h"
+#include "../cimgui_impl_raylib.h"
 #include <raylib.h>
-#include "event.h"
-#include "recording_system.h"
-#include "game_options.h"
-#include "commands.h"
-#include "../mister_queen/uci.h"
+#include "../event/event.h"
+#include "../recording_system/recording_system.h"
+#include "../recording_system/recording_system.h"
+#include "../game_options.h"
+#include "../commands.h"
+#include "../../mister_queen/uci.h"
 
 extern game_options_t game_options;
 extern char commands[COMMAND_COUNT][50];

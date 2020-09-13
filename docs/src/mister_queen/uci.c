@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../game/console_output.h"
+#include "../game/console_output/console_output.h"
 #include <stdlib.h>
 #include <string.h>
 #include "bk.h"

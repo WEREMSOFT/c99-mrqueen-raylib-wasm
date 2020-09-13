@@ -27,6 +27,14 @@ ASM_D := asm/
 
 SRC_FILES := $(wildcard $(SRC_D)*.c)
 SRC_FILES += $(wildcard $(SRC_D)game/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/command_history/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/console_output/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/event/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/game_board/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/game_context/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/gui_system/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/recording_system/*.c)
+SRC_FILES += $(wildcard $(SRC_D)game/selector/*.c)
 SRC_FILES += $(wildcard $(SRC_D)mister_queen/*.c)
 OBJ_FILES := $(patsubst $(SRC_D)%.c,$(OBJ_D)%.o,$(SRC_FILES))
 

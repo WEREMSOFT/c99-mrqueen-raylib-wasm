@@ -2,11 +2,11 @@
 
 #include <unistd.h>
 #include <stdio.h>
-#include "game/console_output.h"
+#include "game/console_output/console_output.h"
 #include "mister_queen/bb.h"
 #include "mister_queen/util.h"
-#include "game/game_context.h"
-#include "game/gui_system.h"
+#include "game/game_context/game_context.h"
+#include "game/gui_system/gui_system.h"
 #include <raylib.h>
 
 #ifdef OS_WEB

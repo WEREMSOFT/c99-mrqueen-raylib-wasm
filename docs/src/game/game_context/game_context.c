@@ -1,12 +1,13 @@
 #include <raylib.h>
 #include <raymath.h>
-#include "commands.h"
-#include "event.h"
-#include "game_board.h"
-#include "selector.h"
-#include "game_options.h"
-#include "gui_system.h"
-#include "recording_system.h"
+#include <msf_gif.h>
+#include "../commands.h"
+#include "../event/event.h"
+#include "../game_board/game_board.h"
+#include "../selector/selector.h"
+#include "../game_options.h"
+#include "../gui_system/gui_system.h"
+#include "../recording_system/recording_system.h"
 #include "game_context.h"
 #define RLIGHTS_IMPLEMENTATION
 #include <rlights.h>
@@ -217,7 +218,7 @@ game_context_t game_context_init(void){
 
     lights_init(&game_context);
 
-    game_context.update = &process_state_playing;
+    game_context.update = process_state_playing;
 
     return game_context;
 }
@@ -229,7 +230,7 @@ void game_context_fini(void) {
 }
 
 void game_context_pass_to_state_animating(char* position){
-    game_context.update = &process_state_animating;
+    game_context.update = process_state_animating;
     game_context.piece_to_move_lerp_percentage = 0;
     game_context.piece_to_move = game_board_get_piece_at_source(game_context.board, position);
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world(position);
@@ -248,7 +249,7 @@ static void process_state_castling_black_right(void){
             game_board_set_piece_at_target(game_context.board, "xxf8", TWR_B);
             game_board_set_piece_at_source(game_context.board, "h8xx", EMPTY);
 
-            game_context.update = &process_state_playing;
+            game_context.update = process_state_playing;
             game_context.selector.state = SELECTOR_STATE_READY;
     }
     game_context_draw_pre();
@@ -267,7 +268,7 @@ static void process_state_castling_black_right(void){
 }
 
 void game_context_pass_to_state_castling_black_right(void){
-    game_context.update = &process_state_castling_black_right;
+    game_context.update = process_state_castling_black_right;
     
     game_context.piece_to_move_lerp_percentage = 0;
 
@@ -282,7 +283,7 @@ void game_context_pass_to_state_castling_black_right(void){
 }
 
 void game_context_pass_to_state_castling_black_left(void){
-    game_context.update = &process_state_castling_black_left;
+    game_context.update = process_state_castling_black_left;
     game_context.piece_to_move_lerp_percentage = 0;
 
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world("e8xx");
@@ -296,7 +297,7 @@ void game_context_pass_to_state_castling_black_left(void){
 }
 
 void game_context_pass_to_state_castling_white_right(void){
-    game_context.update = &process_state_castling_white_right;
+    game_context.update = process_state_castling_white_right;
     game_context.piece_to_move_lerp_percentage = 0;
 
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world("e1xx");
@@ -310,7 +311,7 @@ void game_context_pass_to_state_castling_white_right(void){
 }
 
 void game_context_pass_to_state_castling_white_left(void){
-    game_context.update = &process_state_castling_white_left;
+    game_context.update = process_state_castling_white_left;
     game_context.piece_to_move_lerp_percentage = 0;
 
     game_context.piece_to_move_position_actual = game_board_get_source_coordinates_in_world("e1xx");
@@ -335,7 +336,7 @@ void game_context_event_process(void){
                 parse_line((char *)&commands[ISREADY]);
                 game_board_reset(game_context.board);
                 char *history_buffer = command_history_get_buffer();
-                game_context.update = &process_state_playing;
+                game_context.update = process_state_playing;
                 memset(history_buffer, 0, COMMAND_HISTORY_SIZE);
                 selector_pass_to_state_ready(&game_context.selector);
                 event_queue_init();
@@ -491,15 +492,15 @@ static void process_state_animating(void){
             game_context.piece_to_move_position_actual = game_context.piece_to_move_position_target;
             game_board_set_piece_at_target(game_context.board, game_context.target_position, game_context.piece_to_move);
             game_board_set_piece_at_source(game_context.board, game_context.target_position, EMPTY);
-            game_context.update = &process_state_playing;
+            game_context.update = process_state_playing;
 
 
             if(piece == KNG_B){
-                game_context.update = &process_state_won_white;
+                game_context.update = process_state_won_white;
                 recording_system_stop_recording();
             }
             if(piece == KNG_W){
-                game_context.update = &process_state_won_black;
+                game_context.update = process_state_won_black;
                 recording_system_stop_recording();
             }
     }
@@ -587,7 +588,7 @@ static void process_state_castling_white_left(void){
             game_board_set_piece_at_target(game_context.board, "xxd1", TWR_W);
             game_board_set_piece_at_source(game_context.board, "a1xx", EMPTY);
 
-            game_context.update = &process_state_playing;
+            game_context.update = process_state_playing;
     }
     game_context_draw_pre();
 
@@ -616,7 +617,7 @@ static void process_state_castling_black_left(void){
             game_board_set_piece_at_target(game_context.board, "xxd8", TWR_B);
             game_board_set_piece_at_source(game_context.board, "a8xx", EMPTY);
 
-            game_context.update = &process_state_playing;
+            game_context.update = process_state_playing;
             game_context.selector.state = SELECTOR_STATE_READY;
     }
     game_context_draw_pre();

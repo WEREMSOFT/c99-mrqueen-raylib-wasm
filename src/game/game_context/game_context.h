@@ -1,9 +1,9 @@
 #ifndef __GAME_STATE_H__
 #define __GAME_STATE_H__
 
-#include "command_history.h"
-#include "selector.h"
-#include "../mister_queen/uci.h"
+#include "../command_history/command_history.h"
+#include "../selector/selector.h"
+#include "../../mister_queen/uci.h"
 #include <msf_gif.h>
 #include <raylib.h>
 #include <rlights.h>

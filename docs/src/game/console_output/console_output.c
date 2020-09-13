@@ -1,8 +1,8 @@
-#include "console_output.h"
+#include "../console_output/console_output.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "event.h"
+#include "../event/event.h"
 
 static char console_buffer[1000] = {0};
 

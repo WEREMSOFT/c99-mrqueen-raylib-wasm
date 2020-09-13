@@ -1,8 +1,8 @@
 #include "selector.h"
 #include <raylib.h>
-#include "game_options.h"
-#include "event.h"
-#include "game_board.h"
+#include "../game_options.h"
+#include "../event/event.h"
+#include "../game_board/game_board.h"
 
 extern game_options_t game_options;
 
